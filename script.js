@@ -17,7 +17,7 @@ window.onload = function () {
     else { 
 	alert("Este navegador não suporta Files");
     } 
-}
+};
 
 function fileReadingRoutine(evt) {
     var id = evt.target.id;
@@ -55,7 +55,7 @@ function fileReadingRoutine(evt) {
 		window.alert(err);
 	    }
 	}
-    }
+    };
     
     // lê o arquivo como texto, eventualmente invocando a função acima
     fileReader.readAsText(fileTobeRead);

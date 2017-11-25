@@ -4,7 +4,7 @@ function Leitor(str) {
 	this.contador = 0;
     } else {
 	var errormsg = 'str não é string. ' + typeof str;
-	throw errormsg
+	throw errormsg;
     }
 }
 
@@ -26,13 +26,13 @@ Leitor.prototype.proximaPalavra = function() {
 	r = r + this.str[this.contador];
     }
     return r;
-}
+};
 
 // ignora todas as palavras até encontrar um inteiro ou percorrer toda a string
 Leitor.prototype.proximoInt = function() {
     var r = null;
     try {
-	r = parseInt(this.proximaPalavra())
+	r = parseInt(this.proximaPalavra());
 	while (isNaN(r)) {
 	    r = parseInt(this.proximaPalavra());
 	}
@@ -40,13 +40,13 @@ Leitor.prototype.proximoInt = function() {
 	throw 'Nenhum int foi encontrado';
     }
     return r;
-}
+};
 
 // ignora todas as palavras até encontrar um float ou percorrer toda a string
 Leitor.prototype.proximoFloat = function() {
     var r = null;
     try {
-	r = parseFloat(this.proximaPalavra())
+	r = parseFloat(this.proximaPalavra());
 	while (isNaN(r)) {
 	    r = parseFloat(this.proximaPalavra());
 	}
@@ -54,7 +54,7 @@ Leitor.prototype.proximoFloat = function() {
 	throw 'Nenhum float foi encontrado';
     }
     return r;
-}
+};
 
 // a primeira palavra encontrada precisa ser um int
 Leitor.prototype.proximoInt2 = function() {
@@ -112,7 +112,7 @@ Leitor.prototype.lerCamera = function() {
 	throw 'Arquivo não está no formato correto de câmera';
     }
     return {C, N, V, d, h};
-}
+};
 
 Leitor.prototype.lerIluminacao = function() {
     this.contador = 0;
@@ -152,7 +152,7 @@ Leitor.prototype.lerIluminacao = function() {
 	throw 'Arquivo não está no formato correto de iluminação';
     }
     return {Pl, ka, Ia, kd, Od, ks, Il, n};
-}
+};
 
 Leitor.prototype.lerObjeto = function() {
     this.contador = 0;
@@ -182,4 +182,4 @@ Leitor.prototype.lerObjeto = function() {
 	throw 'Arquivo não está no formato correto de objeto';
     }
     return {V, F};
-}
+};
