@@ -25,7 +25,6 @@ Leitor.prototype.proximaPalavra = function() {
 	}
 	r = r + this.str[this.contador];
     }
-    this.contador = this.contador;
     return r;
 }
 
