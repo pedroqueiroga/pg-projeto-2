@@ -121,19 +121,21 @@ Leitor.prototype.lerCamera = function() {
 
 Leitor.prototype.lerIluminacao = function() {
     this.contador = 0;
-    var Pl = {},
+    var Pl,
 	ka,
 	Ia = {},
 	kd,
-	Od = {},
+	Od,
 	ks,
 	Il = {},
-	n;
+	n,
+	x, y, z;
     try {
-	Pl.x = this.proximoFloat();
-	Pl.y = this.proximoFloat();
-	Pl.z = this.proximoFloat();
-
+	x = this.proximoFloat();
+	y = this.proximoFloat();
+	z = this.proximoFloat();
+	Pl = new Ponto(x, y, z);
+	
 	ka = this.proximoFloat();
 
 	Ia.x = this.proximoInt();
@@ -142,10 +144,11 @@ Leitor.prototype.lerIluminacao = function() {
 
 	kd = this.proximoFloat();
 
-	Od.x = this.proximoInt();
-	Od.y = this.proximoInt();
-	Od.z = this.proximoInt();
-
+	x = this.proximoInt();
+	y = this.proximoInt();
+	z = this.proximoInt();
+	Od = new Vetor(x, y, z);
+	
 	ks = this.proximoFloat();
 
 	Il.x = this.proximoInt();
@@ -156,10 +159,6 @@ Leitor.prototype.lerIluminacao = function() {
     } catch (err) {
 	throw 'Arquivo não está no formato correto de iluminação\n' + err;
     }
-    Pl = new Vetor(Pl.x, Pl.y, Pl.z);
-    Ia = new Vetor(Ia.x, Ia.y, Ia.z);
-    Od = new Vetor(Od.x, Od.y, Od.z);
-    Il = new Vetor(Il.x, Il.y, Il.z);
     return {Pl, ka, Ia, kd, Od, ks, Il, n};
 };
 
