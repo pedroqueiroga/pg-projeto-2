@@ -86,6 +86,7 @@ Leitor.prototype.proximoInt2 = function() {
 };
 
 Leitor.prototype.lerCamera = function() {
+    this.contador = 0;
     var C = {},
 	N = {},
 	V = {},
@@ -115,6 +116,7 @@ Leitor.prototype.lerCamera = function() {
 }
 
 Leitor.prototype.lerIluminacao = function() {
+    this.contador = 0;
     var Pl = {},
 	ka,
 	Ia = {},
@@ -151,4 +153,34 @@ Leitor.prototype.lerIluminacao = function() {
 	throw 'Arquivo não está no formato correto de iluminação';
     }
     return {Pl, ka, Ia, kd, Od, ks, Il, n};
+}
+
+Leitor.prototype.lerObjeto = function() {
+    this.contador = 0;
+    
+    // V de vértices, F de faces
+    // (notação de sílvio, equivalente a pontos e triângulos)
+    var V = [],
+	F = [];
+    try {
+	var qtdVertices = this.proximoInt(),
+	    qtdFaces = this.proximoInt();
+	// ler todos os vertices
+	for (var i = 0; i < qtdVertices; i++) {
+	    V[i] = {};
+	    V[i].x = this.proximoFloat();
+	    V[i].y = this.proximoFloat();
+	    V[i].z = this.proximoFloat();
+	}
+	// agora ler todas as faces
+	for (i = 0; i < qtdFaces; i++) {
+	    F[i] = {};
+	    F[i].a = this.proximoInt();
+	    F[i].b = this.proximoInt();
+	    F[i].c = this.proximoInt();
+	}
+    } catch (err) {
+	throw 'Arquivo não está no formato correto de objeto';
+    }
+    return {V, F};
 }

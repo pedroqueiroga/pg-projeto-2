@@ -3,12 +3,16 @@ window.onload = function () {
     if (window.File && window.FileReader && window.FileList && window.Blob) {
 	var cameraFileChooser = document.getElementById('cameraFile');
 	var lightFileChooser = document.getElementById('lightFile');
+	var objectFileChooser = document.getElementById('objectFile');
 	cameraFileChooser.addEventListener('change',
 					   fileReadingRoutine,
 					   false);
 	lightFileChooser.addEventListener('change',
 					  fileReadingRoutine,
 					  false);
+	objectFileChooser.addEventListener('change',
+					   fileReadingRoutine,
+					   false);
     } 
     else { 
 	alert("Este navegador não suporta Files");
@@ -39,6 +43,14 @@ function fileReadingRoutine(evt) {
 		values = leitor.lerIluminacao();
 		output(syntaxHighlight(JSON.stringify(values, null, 4)),
 		       'chosenlight');
+	    } catch (err) {
+		window.alert(err);
+	    }
+	} else if (id === 'objectFile') {
+	    try {
+		values = leitor.lerObjeto();
+		output(syntaxHighlight(JSON.stringify(values, null, 4)),
+		       'chosenobject');
 	    } catch (err) {
 		window.alert(err);
 	    }
