@@ -86,38 +86,37 @@ Leitor.prototype.proximoInt2 = function() {
 
 Leitor.prototype.lerCamera = function() {
     this.contador = 0;
-    var C = {},
-	N = {},
-	V = {},
-	U = {},
-	h = {};
+    var C,
+	N,
+	V,
+	h = {},
+	d,
+	x, y, z;
 
     try {
-	C.x = this.proximoFloat();
-	C.y = this.proximoFloat();
-	C.z = this.proximoFloat();
-
-	N.x = this.proximoFloat();
-	N.y = this.proximoFloat();
-	N.z = this.proximoFloat();
-
-	V.x = this.proximoFloat();
-	V.y = this.proximoFloat();
-	V.z = this.proximoFloat();
+	x = this.proximoFloat();
+	y = this.proximoFloat();
+	z = this.proximoFloat();
+	C = new Vetor(x, y, z);
+	
+	x = this.proximoFloat();
+	y = this.proximoFloat();
+	z = this.proximoFloat();
+	N = new Vetor(x, y, z);
+	
+	x = this.proximoFloat();
+	y = this.proximoFloat();
+	z = this.proximoFloat();
+	V = new Vetor(x, y, z);
 
 	d = this.proximoFloat();
 
 	h.x = this.proximoFloat();
 	h.y = this.proximoFloat();
-	
-	V = subtracao(V, projecao(V,N));
-	N = normaliza(N);
-	V = normaliza(V);
-	U = produtoVetorial(N,V);
     } catch (err) {
-	throw 'Arquivo não está no formato correto de câmera';
+	throw 'Arquivo não está no formato correto de câmera\n' + err;
     }
-    return {C, N, V, U, d, h};
+    return {C, N, V, d, h};
 };
 
 Leitor.prototype.lerIluminacao = function() {
@@ -155,37 +154,45 @@ Leitor.prototype.lerIluminacao = function() {
 
 	n = this.proximoFloat();
     } catch (err) {
-	throw 'Arquivo não está no formato correto de iluminação';
+	throw 'Arquivo não está no formato correto de iluminação\n' + err;
     }
+    Pl = new Vetor(Pl.x, Pl.y, Pl.z);
+    Ia = new Vetor(Ia.x, Ia.y, Ia.z);
+    Od = new Vetor(Od.x, Od.y, Od.z);
+    Il = new Vetor(Il.x, Il.y, Il.z);
     return {Pl, ka, Ia, kd, Od, ks, Il, n};
 };
 
+// cada vértice é um objeto Ponto,
+// cada face é um objeto Triangulo.
 Leitor.prototype.lerObjeto = function() {
     this.contador = 0;
     
     // V de vértices, F de faces
     // (notação de sílvio, equivalente a pontos e triângulos)
     var V = [],
-	F = [];
+	F = [],
+	x, y, z;
     try {
 	var qtdVertices = this.proximoInt(),
 	    qtdFaces = this.proximoInt();
 	// ler todos os vertices
 	for (var i = 0; i < qtdVertices; i++) {
-	    V[i] = {};
-	    V[i].x = this.proximoFloat();
-	    V[i].y = this.proximoFloat();
-	    V[i].z = this.proximoFloat();
+	    x = this.proximoFloat();
+	    y = this.proximoFloat();
+	    z = this.proximoFloat();
+	    V[i] = new Ponto(x, y, z);
 	}
 	// agora ler todas as faces
 	for (i = 0; i < qtdFaces; i++) {
 	    F[i] = {};
-	    F[i].a = this.proximoInt();
-	    F[i].b = this.proximoInt();
-	    F[i].c = this.proximoInt();
+	    // subtrair 1 pois no arquivo não tem ponto 0
+	    F[i].a = this.proximoInt() - 1;
+	    F[i].b = this.proximoInt() - 1;
+	    F[i].c = this.proximoInt() - 1;
 	}
     } catch (err) {
-	throw 'Arquivo não está no formato correto de objeto';
+	throw 'Arquivo não está no formato correto de objeto\n' + err;
     }
     return {V, F};
 };
