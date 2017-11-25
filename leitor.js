@@ -97,7 +97,7 @@ Leitor.prototype.lerCamera = function() {
 	x = this.proximoFloat();
 	y = this.proximoFloat();
 	z = this.proximoFloat();
-	C = new Vetor(x, y, z);
+	C = new Ponto(x, y, z);
 	
 	x = this.proximoFloat();
 	y = this.proximoFloat();
