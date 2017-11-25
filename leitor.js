@@ -92,22 +92,22 @@ Leitor.prototype.lerCamera = function() {
 	h = {};
 
     try {
-	C.x = leitor.proximoFloat();
-	C.y = leitor.proximoFloat();
-	C.z = leitor.proximoFloat();
+	C.x = this.proximoFloat();
+	C.y = this.proximoFloat();
+	C.z = this.proximoFloat();
 
-	N.x = leitor.proximoFloat();
-	N.y = leitor.proximoFloat();
-	N.z = leitor.proximoFloat();
+	N.x = this.proximoFloat();
+	N.y = this.proximoFloat();
+	N.z = this.proximoFloat();
 
-	V.x = leitor.proximoFloat();
-	V.y = leitor.proximoFloat();
-	V.z = leitor.proximoFloat();
+	V.x = this.proximoFloat();
+	V.y = this.proximoFloat();
+	V.z = this.proximoFloat();
 
-	d = leitor.proximoFloat();
+	d = this.proximoFloat();
 
-	h.x = leitor.proximoFloat();
-	h.y = leitor.proximoFloat();
+	h.x = this.proximoFloat();
+	h.y = this.proximoFloat();
     } catch (err) {
 	throw 'Arquivo não está no formato correto de câmera';
     }
@@ -124,29 +124,29 @@ Leitor.prototype.lerIluminacao = function() {
 	Il = {},
 	n;
     try {
-	Pl.x = leitor.proximoFloat();
-	Pl.y = leitor.proximoFloat();
-	Pl.z = leitor.proximoFloat();
+	Pl.x = this.proximoFloat();
+	Pl.y = this.proximoFloat();
+	Pl.z = this.proximoFloat();
 
-	ka = leitor.proximoFloat();
+	ka = this.proximoFloat();
 
-	Ia.r = leitor.proximoInt();
-	Ia.g = leitor.proximoInt();
-	Ia.b = leitor.proximoInt();
+	Ia.r = this.proximoInt();
+	Ia.g = this.proximoInt();
+	Ia.b = this.proximoInt();
 
-	kd = leitor.proximoFloat();
+	kd = this.proximoFloat();
 
-	Od.r = leitor.proximoInt();
-	Od.g = leitor.proximoInt();
-	Od.b = leitor.proximoInt();
+	Od.r = this.proximoInt();
+	Od.g = this.proximoInt();
+	Od.b = this.proximoInt();
 
-	ks = leitor.proximoFloat();
+	ks = this.proximoFloat();
 
-	Il.r = leitor.proximoInt();
-	Il.g = leitor.proximoInt();
-	Il.b = leitor.proximoInt();
+	Il.r = this.proximoInt();
+	Il.g = this.proximoInt();
+	Il.b = this.proximoInt();
 
-	n = leitor.proximoFloat();
+	n = this.proximoFloat();
     } catch (err) {
 	throw 'Arquivo não está no formato correto de iluminação';
     }
