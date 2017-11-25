@@ -89,6 +89,7 @@ Leitor.prototype.lerCamera = function() {
     var C = {},
 	N = {},
 	V = {},
+	U = {},
 	h = {};
 
     try {
@@ -108,10 +109,15 @@ Leitor.prototype.lerCamera = function() {
 
 	h.x = this.proximoFloat();
 	h.y = this.proximoFloat();
+	
+	V = subtracao(V, projecao(V,N));
+	N = normaliza(N);
+	V = normaliza(V);
+	U = produtoVetorial(N,V);
     } catch (err) {
 	throw 'Arquivo não está no formato correto de câmera';
     }
-    return {C, N, V, d, h};
+    return {C, N, V, U, d, h};
 }
 
 Leitor.prototype.lerIluminacao = function() {
@@ -131,21 +137,21 @@ Leitor.prototype.lerIluminacao = function() {
 
 	ka = this.proximoFloat();
 
-	Ia.r = this.proximoInt();
-	Ia.g = this.proximoInt();
-	Ia.b = this.proximoInt();
+	Ia.x = this.proximoInt();
+	Ia.y = this.proximoInt();
+	Ia.z = this.proximoInt();
 
 	kd = this.proximoFloat();
 
-	Od.r = this.proximoInt();
-	Od.g = this.proximoInt();
-	Od.b = this.proximoInt();
+	Od.x = this.proximoInt();
+	Od.y = this.proximoInt();
+	Od.z = this.proximoInt();
 
 	ks = this.proximoFloat();
 
-	Il.r = this.proximoInt();
-	Il.g = this.proximoInt();
-	Il.b = this.proximoInt();
+	Il.x = this.proximoInt();
+	Il.y = this.proximoInt();
+	Il.z = this.proximoInt();
 
 	n = this.proximoFloat();
     } catch (err) {
