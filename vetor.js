@@ -2,6 +2,9 @@ function Vetor(x, y, z) {
     if (typeof x !== 'number' ||
 	typeof y !== 'number' ||
 	typeof z !== 'number') {
+	console.log('x: ' + x + '\n' +
+		    'y: ' + y + '\n' +
+		    'z: ' + z);
 	throw 'Não é um vetor';
     }
     this.x = x;
@@ -19,6 +22,7 @@ Vetor.prototype.igual = function(v2) {
 
 Vetor.prototype.mais = function(v2) {
     if (!(v2 instanceof Vetor)) {
+	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }
     var v = new Vetor(this.x + v2.x,
@@ -29,6 +33,7 @@ Vetor.prototype.mais = function(v2) {
 
 Vetor.prototype.menos = function(v2) {
     if (!(v2 instanceof Vetor)) {
+	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }
     var v = new Vetor(this.x - v2.x,
@@ -46,6 +51,7 @@ Vetor.prototype.produtoEscalar = function(escalar) {
 
 Vetor.prototype.produtoComponentes = function(v2) {
     if (!(v2 instanceof Vetor)) {
+	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }
     var v = new Vetor(this.x * v2.x,
@@ -56,6 +62,7 @@ Vetor.prototype.produtoComponentes = function(v2) {
 
 Vetor.prototype.produtoInterno = function(v2) {
     if (!(v2 instanceof Vetor)) {
+	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }
     var pi = (this.x * v2.x) + (this.y * v2.y) + (this.z * v2.z);
@@ -64,6 +71,7 @@ Vetor.prototype.produtoInterno = function(v2) {
 
 Vetor.prototype.produtoVetorial = function(v2) {
     if (!(v2 instanceof Vetor)) {
+	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }    
     var v = new Vetor(this.y * v2.z - this.z * v2.y,
@@ -74,6 +82,7 @@ Vetor.prototype.produtoVetorial = function(v2) {
 
 Vetor.prototype.projecao = function(v2) {
     if (!(v2 instanceof Vetor)) {
+	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }
     var proj = v2.produtoEscalar(this.produtoInterno(v2)/v2.produtoInterno(v2));
