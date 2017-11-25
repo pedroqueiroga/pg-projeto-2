@@ -4,7 +4,7 @@ var adicao = function(a,b) {
 		y: a.y + b.y,
 		z: a.z + b.z
 	};
-}
+};
 
 var subtracao = function(a,b) {
 	return adicao(a,produtoEscalar(b,-1));
@@ -16,7 +16,7 @@ var produtoComponentes = function(a,b) {
 		y:(a.y * b.y),
 		z:(a.z * b.z)
 	};
-}
+};
 
 var produtoEscalar = function(vetor, escalar) {
 	return {
@@ -24,11 +24,11 @@ var produtoEscalar = function(vetor, escalar) {
 		y: vetor.y * escalar,
 		z: vetor.z * escalar
 	};
-}
+};
 
 var produtoInterno = function(a,b) {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-}
+};
 
 var produtoVetorial = function(a,b) {
 	return {
@@ -36,16 +36,16 @@ var produtoVetorial = function(a,b) {
 		y:(a.z * b.x - a.x * b.z),
 		z:(a.x * b.y - a.y * b.x)
 	};
-}
+};
 
 //projecao de a sobre b
 var projecao = function(a,b) {
 	return produtoEscalar(b, produtoInterno(a,b)/produtoInterno(b,b));
-}
+};
 
 var norma = function(a) {
 	return Math.sqrt(produtoInterno(a,a));
-}
+};
 
 var normaliza = function(a) {
 	var n = norma(a);
@@ -54,7 +54,7 @@ var normaliza = function(a) {
 		y: a.y/n,
 		z: a.z/n
 	};
-}
+};
 
 var identidade = function(a,b,c) {
 	var det = 1/(a.x*b.y*c.z - a.x*b.z*c.y - a.y*b.x*c.z + a.y*b.z*c.x + a.z*b.x*c.y - a.z*b.y*c.x);
@@ -71,7 +71,7 @@ var identidade = function(a,b,c) {
 		ytoz: ((a.z*b.x - a.x*b.z)*det),
 		ztoz: ((a.x*b.y - a.y*b.x)*det)
 	};
-}
+};
 
 var multiplicacaoMatrizVetor = function (M, v) {
 	return {
@@ -79,4 +79,4 @@ var multiplicacaoMatrizVetor = function (M, v) {
 		y: M.xtoy * v.x + M.ytoy * v.y + M.ztoy * v.z,
 		z: M.xtoz * v.x + M.ytoz * v.y + M.ztoz * v.z
 	};
-}
+};
