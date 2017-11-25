@@ -3,7 +3,7 @@ function Leitor(str) {
 	this.str = str;
 	this.contador = 0;
     } else {
-	errormsg = 'str não é string. ' + typeof str;
+	var errormsg = 'str não é string. ' + typeof str;
 	throw errormsg
     }
 }
@@ -17,7 +17,7 @@ Leitor.prototype.proximaPalavra = function() {
     if (this.contador == this.str.length) {
 	throw 'Nenhuma palavra foi encontrada';
     }
-    r = '';
+    var r = '';
     for (; this.contador < this.str.length; this.contador++) {
 	if (this.str[this.contador] === ' ' ||
 	    this.str[this.contador] === '\n') {
@@ -31,7 +31,7 @@ Leitor.prototype.proximaPalavra = function() {
 
 // ignora todas as palavras até encontrar um inteiro ou percorrer toda a string
 Leitor.prototype.proximoInt = function() {
-    r = null;
+    var r = null;
     try {
 	r = parseInt(this.proximaPalavra())
 	while (isNaN(r)) {
@@ -45,7 +45,7 @@ Leitor.prototype.proximoInt = function() {
 
 // ignora todas as palavras até encontrar um float ou percorrer toda a string
 Leitor.prototype.proximoFloat = function() {
-    r = null;
+    var r = null;
     try {
 	r = parseFloat(this.proximaPalavra())
 	while (isNaN(r)) {
@@ -59,7 +59,7 @@ Leitor.prototype.proximoFloat = function() {
 
 // a primeira palavra encontrada precisa ser um int
 Leitor.prototype.proximoInt2 = function() {
-    i = this.contador;
+    var i = this.contador;
     while (i < this.str.length &&
 	   (isNaN(parseInt(this.str[i])) &&
 	    this.str[i] !== '-')) {
@@ -86,27 +86,69 @@ Leitor.prototype.proximoInt2 = function() {
 };
 
 Leitor.prototype.lerCamera = function() {
-    C = {};
-    N = {};
-    V = {};
-    h = {};
-    
-    C.x = leitor.proximoFloat();
-    C.y = leitor.proximoFloat();
-    C.z = leitor.proximoFloat();
+    var C = {},
+	N = {},
+	V = {},
+	h = {};
 
-    N.x = leitor.proximoFloat();
-    N.y = leitor.proximoFloat();
-    N.z = leitor.proximoFloat();
+    try {
+	C.x = leitor.proximoFloat();
+	C.y = leitor.proximoFloat();
+	C.z = leitor.proximoFloat();
 
-    V.x = leitor.proximoFloat();
-    V.y = leitor.proximoFloat();
-    V.z = leitor.proximoFloat();
+	N.x = leitor.proximoFloat();
+	N.y = leitor.proximoFloat();
+	N.z = leitor.proximoFloat();
 
-    d = leitor.proximoFloat();
+	V.x = leitor.proximoFloat();
+	V.y = leitor.proximoFloat();
+	V.z = leitor.proximoFloat();
 
-    h.x = leitor.proximoFloat();
-    h.y = leitor.proximoFloat();
+	d = leitor.proximoFloat();
 
+	h.x = leitor.proximoFloat();
+	h.y = leitor.proximoFloat();
+    } catch (err) {
+	throw 'Arquivo não está no formato correto de câmera';
+    }
     return {C, N, V, d, h};
+}
+
+Leitor.prototype.lerIluminacao = function() {
+    var Pl = {},
+	ka,
+	Ia = {},
+	kd,
+	Od = {},
+	ks,
+	Il = {},
+	n;
+    try {
+	Pl.x = leitor.proximoFloat();
+	Pl.y = leitor.proximoFloat();
+	Pl.z = leitor.proximoFloat();
+
+	ka = leitor.proximoFloat();
+
+	Ia.r = leitor.proximoInt();
+	Ia.g = leitor.proximoInt();
+	Ia.b = leitor.proximoInt();
+
+	kd = leitor.proximoFloat();
+
+	Od.r = leitor.proximoInt();
+	Od.g = leitor.proximoInt();
+	Od.b = leitor.proximoInt();
+
+	ks = leitor.proximoFloat();
+
+	Il.r = leitor.proximoInt();
+	Il.g = leitor.proximoInt();
+	Il.b = leitor.proximoInt();
+
+	n = leitor.proximoFloat();
+    } catch (err) {
+	throw 'Arquivo não está no formato correto de iluminação';
+    }
+    return {Pl, ka, Ia, kd, Od, ks, Il, n};
 }

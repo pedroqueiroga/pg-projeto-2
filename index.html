@@ -2,6 +2,14 @@
 <meta charset="UTF-8"> 
 <html>
   <head>
+    <style>
+      pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+      .string { color: green; }
+      .number { color: darkorange; }
+      .boolean { color: blue; }
+      .null { color: magenta; }
+      .key { color: red; }
+    </style>
     <title></title>
     <script type="text/javascript" src="script.js"></script>
     <script type="text/javascript" src="leitor.js"></script>
@@ -10,7 +18,9 @@
     Escolha o arquivo de configuração da câmera.
     <input type="file" id="cameraFile" />
     <div id="chosencamera"></div>
-    <div id="filecontents"></div>
-    <canvas id="canvas"></canvas>
+    <!--    <canvas id="canvas"></canvas> -->
+    Escolha o arquivo de configuração da iluminação.
+    <input type="file" id="lightFile" />
+    <div id="chosenlight"></div>
   </body>
 </html>
