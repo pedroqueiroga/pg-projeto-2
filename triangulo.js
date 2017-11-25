@@ -31,4 +31,8 @@ function Triangulo(a, b, c) {
     this.b = b;
     this.c = c;
     // não sei a necessidade de ter o comprimento dos lados ainda
+
+    this.normal = ((this.c).menos(this.a))
+	.produtoVetorial((this.b).menos(this.a));
+    this.normal = (this.normal).normalizado;
 }
