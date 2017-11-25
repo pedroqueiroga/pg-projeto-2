@@ -34,7 +34,8 @@ function fileReadingRoutine(evt) {
 	if (id === 'cameraFile') {
 	    try {
 		values = leitor.lerCamera();
-	    	output(syntaxHighlight(JSON.stringify(values, null, 4)),
+		camera = new Camera(values);
+	    	output(syntaxHighlight(JSON.stringify(camera, null, 4)),
 		       'chosencamera');} catch (err) {
 		window.alert(err);
 	    }
