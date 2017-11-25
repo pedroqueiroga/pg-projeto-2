@@ -91,22 +91,22 @@ Leitor.prototype.lerCamera = function() {
     V = {};
     h = {};
     
-    C.x = leitor.proximoInt();
-    C.y = leitor.proximoInt();
-    C.z = leitor.proximoInt();
+    C.x = leitor.proximoFloat();
+    C.y = leitor.proximoFloat();
+    C.z = leitor.proximoFloat();
 
-    N.x = leitor.proximoInt();
-    N.y = leitor.proximoInt();
-    N.z = leitor.proximoInt();
+    N.x = leitor.proximoFloat();
+    N.y = leitor.proximoFloat();
+    N.z = leitor.proximoFloat();
 
-    V.x = leitor.proximoInt();
-    V.y = leitor.proximoInt();
-    V.z = leitor.proximoInt();
+    V.x = leitor.proximoFloat();
+    V.y = leitor.proximoFloat();
+    V.z = leitor.proximoFloat();
 
-    d = leitor.proximoInt();
+    d = leitor.proximoFloat();
 
-    h.x = leitor.proximoInt();
-    h.y = leitor.proximoInt();
+    h.x = leitor.proximoFloat();
+    h.y = leitor.proximoFloat();
 
     return {C, N, V, d, h};
 }
