@@ -54,7 +54,7 @@ function initialSteps() {
 	    .mais(window.objeto.F[i].N);
 	window.objeto.V[b].N = (window.objeto.V[b].N)
 	    .mais(window.objeto.F[i].N);
-	window.objeto.V[b].N = (window.objeto.V[c].N)
+	window.objeto.V[c].N = (window.objeto.V[c].N)
 	    .mais(window.objeto.F[i].N);
     }
 
