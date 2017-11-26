@@ -80,7 +80,7 @@ function threeJSTEST() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 500);
+    var camera = new THREE.PerspectiveCamera(0, window.innerWidth / window.innerHeight, 1, 500);
     camera.position.set(window.camera.C.x,
 			window.camera.C.y,
 			window.camera.C.z);
@@ -110,7 +110,7 @@ function threeJSTEST() {
     }
 
     function render() {
-	camera.position.y -= 0.05;
+	camera.position.z += 0.05;
 	renderer.render( scene, camera );
     }
 }
