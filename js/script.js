@@ -64,6 +64,8 @@ function initialSteps() {
     }
     console.log('ok');
 
+    threeJSTEST();
+
     // essas próximas linhas fazem com que a página demore
     // muito para carregar, por isso estão comentadas.
     
@@ -71,6 +73,46 @@ function initialSteps() {
     // 	JSON.stringify(window.iluminacao, null, 4)), 'chosenlight');
     // output(syntaxHighlight(
     // 	JSON.stringify(window.objeto, null, 4)), 'chosenobject');
+}
+
+function threeJSTEST() {
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var camera = new THREE.PerspectiveCamera(0, window.innerWidth / window.innerHeight, 1, 500);
+    camera.position.set(window.camera.C.x,
+			window.camera.C.y,
+			window.camera.C.z);
+    camera.lookAt(new THREE.Vector3(window.objeto.V[0].x,
+				    window.objeto.V[0].y,
+				    window.objeto.V[0].z));
+
+    var scene = new THREE.Scene();
+
+    //create a blue LineBasicMaterial
+    var material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+
+    var geometry = new THREE.Geometry();
+    for (i = 0; i < window.objeto.V.length; i++) {
+	geometry.vertices.push(new THREE.Vector3(window.objeto.V[i].x,
+						 window.objeto.V[i].y,
+						 window.objeto.V[i].z));
+    }
+
+    var line = new THREE.Line(geometry, material);
+
+    scene.add(line);
+    animate();
+    function animate() {
+	requestAnimationFrame( animate );
+	render();
+    }
+
+    function render() {
+	camera.position.z += 0.05;
+	renderer.render( scene, camera );
+    }
 }
 
 function fileReadingRoutine(evt) {
