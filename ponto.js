@@ -9,7 +9,9 @@ function Ponto(x, y, z) {
     }
     this.x = x;
     this.y = y;
-    this.z = z;    
+    this.z = z;
+
+    this.N = new Vetor(0, 0, 0);
 }
 
 Ponto.prototype.menos = function(pv2) {
