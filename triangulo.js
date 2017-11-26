@@ -1,22 +1,22 @@
-function Triangulo(a, b, c) {
-    if (!(a instanceof Ponto) ||
-	!(b instanceof Ponto) ||
-	!(c instanceof Ponto)) {
-	console.log('a: ' + JSON.stringify(a) + '\n' +
-		    'b: ' + JSON.stringify(b) + '\n' +
-		    'c: ' + JSON.stringify(c));
+function Triangulo(Pa, Pb, Pc, a, b, c) {
+    if (!(Pa instanceof Ponto) ||
+	!(Pb instanceof Ponto) ||
+	!(Pc instanceof Ponto)) {
+	console.log('Pa: ' + JSON.stringify(Pa) + '\n' +
+		    'Pb: ' + JSON.stringify(Pb) + '\n' +
+		    'Pc: ' + JSON.stringify(Pc));
 	throw 'Não são pontos';
     }
-    const ab = a.menos(b);
-    const ac = a.menos(c);
-    const bc = b.menos(c);
+    const ab = Pa.menos(Pb);
+    const ac = Pa.menos(Pc);
+    const bc = Pb.menos(Pc);
 
     if ((ab.norma + ac.norma <= bc.norma) ||
 	(ab.norma + bc.norma <= ac.norma) ||
 	(ac.norma + bc.norma <= ab.norma)) {
-	console.log('a: ' + JSON.stringify(a) + '\n' +
-		    'b: ' + JSON.stringify(b) + '\n' +
-		    'c: ' + JSON.stringify(c));
+	console.log('Pa: ' + JSON.stringify(Pa) + '\n' +
+		    'Pb: ' + JSON.stringify(Pb) + '\n' +
+		    'Pc: ' + JSON.stringify(Pc));
 	console.log('ab: ' + ab.norma + '\n' +
 		    'ac: ' + ac.norma + '\n' +
 		    'bc: ' + bc.norma);
@@ -26,13 +26,15 @@ function Triangulo(a, b, c) {
 	    'ac: ' + ac.norma + '\n' +
 	    'bc: ' + bc.norma;
     }
-    
+    // triângulo guarda apenas o número dos vértices que compõem ele
+    // assim, quando um ponto mudar de coordenada, não preciamos mudar aqui.
     this.a = a;
     this.b = b;
     this.c = c;
     // não sei a necessidade de ter o comprimento dos lados ainda
 
-    this.normal = ((this.c).menos(this.a))
-	.produtoVetorial((this.b).menos(this.a));
-    this.normal = (this.normal).normalizado;
+    // normal do triângulo
+    this.N = (Pc.menos(Pa))
+	.produtoVetorial(Pb.menos(Pa));
+    this.N = (this.N).normalizado();
 }
