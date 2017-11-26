@@ -123,11 +123,11 @@ Leitor.prototype.lerIluminacao = function() {
     this.contador = 0;
     var Pl,
 	ka,
-	Ia = {},
+	Ia,
 	kd,
 	Od,
 	ks,
-	Il = {},
+	Il,
 	n,
 	x, y, z;
     try {
@@ -138,10 +138,11 @@ Leitor.prototype.lerIluminacao = function() {
 	
 	ka = this.proximoFloat();
 
-	Ia.x = this.proximoInt();
-	Ia.y = this.proximoInt();
-	Ia.z = this.proximoInt();
-
+	x = this.proximoInt();
+	y = this.proximoInt();
+	z = this.proximoInt();
+	Ia = new Vetor(x, y, z);
+	
 	kd = this.proximoFloat();
 
 	x = this.proximoInt();
@@ -151,10 +152,11 @@ Leitor.prototype.lerIluminacao = function() {
 	
 	ks = this.proximoFloat();
 
-	Il.x = this.proximoInt();
-	Il.y = this.proximoInt();
-	Il.z = this.proximoInt();
-
+	x = this.proximoInt();
+	y = this.proximoInt();
+	z = this.proximoInt();
+	Il = new Vetor(x, y, z);
+	
 	n = this.proximoFloat();
     } catch (err) {
 	throw 'Arquivo não está no formato correto de iluminação\n' + err;
