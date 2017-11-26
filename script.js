@@ -25,9 +25,11 @@ window.onload = function () {
 
 function initialSteps() {
     var Pl_vista, P_objeto_vista;
+
     Pl_vista = (window.MMBcamera).vezesVetor(
 	((window.iluminacao).Pl).menos((window.camera).C));
     window.iluminacao.Pl = new Ponto(Pl_vista.x, Pl_vista.y, Pl_vista.z);
+
     for (var i = 0; i < (window.objeto.V.length); i++) {
 	P_objeto_vista = (window.MMBcamera).vezesVetor(
 	    (window.objeto.V[i]).menos(window.camera.C));
@@ -36,10 +38,39 @@ function initialSteps() {
 				       P_objeto_vista.z);
     }
 
-    output(syntaxHighlight(
-	JSON.stringify(window.iluminacao, null, 4)), 'chosenlight');
-    output(syntaxHighlight(
-	JSON.stringify(window.objeto, null, 4)), 'chosenobject');
+    for (i = 0; i < (window.objeto.F.length); i++) {
+	// criando triângulos e suas normais
+	var a, b, c;
+
+	a = window.objeto.F[i].a;
+	b = window.objeto.F[i].b;
+	c = window.objeto.F[i].c;
+	window.objeto.F[i] = new Triangulo(window.objeto.V[a],
+					   window.objeto.V[b],
+					   window.objeto.V[c],
+					   a, b, c);
+	// adicionando a normal dos triângulos a cada vértice daquele triângulo
+	window.objeto.V[a].N = (window.objeto.V[a].N)
+	    .mais(window.objeto.F[i].N);
+	window.objeto.V[b].N = (window.objeto.V[b].N)
+	    .mais(window.objeto.F[i].N);
+	window.objeto.V[b].N = (window.objeto.V[c].N)
+	    .mais(window.objeto.F[i].N);
+    }
+
+    for (i = 0; i < (window.objeto.V.length); i++) {
+	// normalizando as normais dos vértices
+	window.objeto.V[i].N = (window.objeto.V[i].N).normalizado();
+    }
+    console.log('ok');
+
+    // essas próximas linhas fazem com que a página demore
+    // muito para carregar, por isso estão comentadas.
+    
+    // output(syntaxHighlight(
+    // 	JSON.stringify(window.iluminacao, null, 4)), 'chosenlight');
+    // output(syntaxHighlight(
+    // 	JSON.stringify(window.objeto, null, 4)), 'chosenobject');
 }
 
 function fileReadingRoutine(evt) {
