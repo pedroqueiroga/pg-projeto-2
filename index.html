@@ -2,14 +2,7 @@
 <meta charset="UTF-8"> 
 <html>
   <head>
-    <style>
-      pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
-      .string { color: green; }
-      .number { color: darkorange; }
-      .boolean { color: blue; }
-      .null { color: magenta; }
-      .key { color: red; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css">
     <title></title>
     <script type="text/javascript" src="js/script.js"></script>
     <script type="text/javascript" src="js/leitor.js"></script>
@@ -20,17 +13,29 @@
     <script type="text/javascript" src="js/matriz.js"></script>    
   </head>
   <body>
-    <button type="button" id="initialSteps">botão</button>
-    <br>
-    Escolha o arquivo de configuração da câmera.
-    <input type="file" id="cameraFile" />
-    <div id="chosencamera"></div>
-    <!--    <canvas id="canvas"></canvas> -->
-    Escolha o arquivo de configuração da iluminação.
-    <input type="file" id="lightFile" />
-    <div id="chosenlight"></div>
-    Escolha o arquivo de objeto.
-    <input type="file" id="objectFile" />
-    <div id="chosenobject"></div>
+    <div id="options">
+      <button type="button" id="initialSteps">botão</button>
+      <table>
+        <tr>
+          <td>Escolha o arquivo de configuração da câmera.</td>
+          <td><input type="file" id="cameraFile"></td>
+          <td><div id="chosencamera"></td>
+        </tr>
+
+        <tr>
+          <td>Escolha o arquivo de configuração da iluminação.</td>
+          <td><input type="file" id="lightFile" /></td>
+          <td><div id="chosenlight"></div></td>
+        </tr>
+      <!--    <canvas id="canvas"></canvas> -->
+        
+        <tr>
+          <td>Escolha o arquivo de objeto.</td>
+          <td><input type="file" id="objectFile" /></td>
+          <td><div id="chosenobject"></div></td>
+        </tr>
+           
+      </table>
+    </div>
   </body>
 </html>
