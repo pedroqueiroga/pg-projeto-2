@@ -4,6 +4,7 @@ window.onload = function () {
 	var cameraFileChooser = document.getElementById('cameraFile');
 	var lightFileChooser = document.getElementById('lightFile');
 	var objectFileChooser = document.getElementById('objectFile');
+	var botao = document.getElementById('initialSteps');
 	cameraFileChooser.addEventListener('change',
 					   fileReadingRoutine,
 					   false);
@@ -13,11 +14,64 @@ window.onload = function () {
 	objectFileChooser.addEventListener('change',
 					   fileReadingRoutine,
 					   false);
+	botao.addEventListener('click',
+			       initialSteps,
+			       false);
     } 
     else { 
 	alert("Este navegador não suporta Files");
     } 
 };
+
+function initialSteps() {
+    var Pl_vista, P_objeto_vista;
+
+    Pl_vista = (window.MMBcamera).vezesVetor(
+	((window.iluminacao).Pl).menos((window.camera).C));
+    window.iluminacao.Pl = new Ponto(Pl_vista.x, Pl_vista.y, Pl_vista.z);
+
+    for (var i = 0; i < (window.objeto.V.length); i++) {
+	P_objeto_vista = (window.MMBcamera).vezesVetor(
+	    (window.objeto.V[i]).menos(window.camera.C));
+	window.objeto.V[i] = new Ponto(P_objeto_vista.x,
+				       P_objeto_vista.y,
+				       P_objeto_vista.z);
+    }
+
+    for (i = 0; i < (window.objeto.F.length); i++) {
+	// criando triângulos e suas normais
+	var a, b, c;
+
+	a = window.objeto.F[i].a;
+	b = window.objeto.F[i].b;
+	c = window.objeto.F[i].c;
+	window.objeto.F[i] = new Triangulo(window.objeto.V[a],
+					   window.objeto.V[b],
+					   window.objeto.V[c],
+					   a, b, c);
+	// adicionando a normal dos triângulos a cada vértice daquele triângulo
+	window.objeto.V[a].N = (window.objeto.V[a].N)
+	    .mais(window.objeto.F[i].N);
+	window.objeto.V[b].N = (window.objeto.V[b].N)
+	    .mais(window.objeto.F[i].N);
+	window.objeto.V[c].N = (window.objeto.V[c].N)
+	    .mais(window.objeto.F[i].N);
+    }
+
+    for (i = 0; i < (window.objeto.V.length); i++) {
+	// normalizando as normais dos vértices
+	window.objeto.V[i].N = (window.objeto.V[i].N).normalizado();
+    }
+    console.log('ok');
+
+    // essas próximas linhas fazem com que a página demore
+    // muito para carregar, por isso estão comentadas.
+    
+    // output(syntaxHighlight(
+    // 	JSON.stringify(window.iluminacao, null, 4)), 'chosenlight');
+    // output(syntaxHighlight(
+    // 	JSON.stringify(window.objeto, null, 4)), 'chosenobject');
+}
 
 function fileReadingRoutine(evt) {
     var id = evt.target.id;
@@ -34,22 +88,28 @@ function fileReadingRoutine(evt) {
 	if (id === 'cameraFile') {
 	    try {
 		values = leitor.lerCamera();
-	    	output(syntaxHighlight(JSON.stringify(values, null, 4)),
+		window.camera = new Camera(values);
+		// Matriz de Mudanca de Base pra camera
+		window.MMBcamera = new Matriz((window.camera).U,
+					      (window.camera).V,
+					      (window.camera).N);
+	    	output(syntaxHighlight(JSON.stringify(window.camera, null, 4)),
 		       'chosencamera');} catch (err) {
 		window.alert(err);
 	    }
 	} else if (id === 'lightFile') {
 	    try {
-		values = leitor.lerIluminacao();
-		output(syntaxHighlight(JSON.stringify(values, null, 4)),
-		       'chosenlight');
+		window.iluminacao = leitor.lerIluminacao();
+		output(syntaxHighlight(
+		    JSON.stringify(window.iluminacao, null, 4)
+		), 'chosenlight');
 	    } catch (err) {
 		window.alert(err);
 	    }
 	} else if (id === 'objectFile') {
 	    try {
-		values = leitor.lerObjeto();
-		output(syntaxHighlight(JSON.stringify(values, null, 4)),
+		window.objeto = leitor.lerObjeto();
+		output(syntaxHighlight(JSON.stringify(window.objeto, null, 4)),
 		       'chosenobject');
 	    } catch (err) {
 		window.alert(err);
