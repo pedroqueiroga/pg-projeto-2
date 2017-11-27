@@ -56,6 +56,22 @@ var normaliza = function(a) {
 	};
 };
 
+var identidadeOrtonormal = function(a,b,c) {
+	return {
+		xtox: a.x;
+		ytox: a.y;
+		ztox: a.z;
+		
+		xtoy: b.x;
+		ytoy: b.y;
+		ztoy: b.z;
+		
+		xtoz: c.x;
+		ytoz: c.y;
+		ztoz: c.z;
+	};
+}
+
 var identidade = function(a,b,c) {
 	var det = 1/(a.x*b.y*c.z - a.x*b.z*c.y - a.y*b.x*c.z + a.y*b.z*c.x + a.z*b.x*c.y - a.z*b.y*c.x);
 	return {
