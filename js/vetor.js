@@ -15,7 +15,7 @@ function Vetor(x, y, z) {
 
 Vetor.prototype.igual = function(v2) {
     if (!(v2 instanceof Vetor)) {
-	return false;
+	throw 'v2 não é um vetor';
     }
     return this.x == v2.x && this.y == v2.y && this.z == v2.z;
 };
