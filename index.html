@@ -14,28 +14,28 @@
   </head>
   <body>
     <div id="options">
-      <button type="button" id="initialSteps">botão</button>
-      <table>
-        <tr>
-          <td>Escolha o arquivo de configuração da câmera.</td>
-          <td><input type="file" id="cameraFile"></td>
-          <td><div id="chosencamera"></td>
-        </tr>
-
-        <tr>
-          <td>Escolha o arquivo de configuração da iluminação.</td>
-          <td><input type="file" id="lightFile" /></td>
-          <td><div id="chosenlight"></div></td>
-        </tr>
-      <!--    <canvas id="canvas"></canvas> -->
+      <div>
+        <label>Escolha o arquivo de configuração da câmera.</label>
+        <input type="file" id="cameraFile">
+      </div>
         
-        <tr>
-          <td>Escolha o arquivo de objeto.</td>
-          <td><input type="file" id="objectFile" /></td>
-          <td><div id="chosenobject"></div></td>
-        </tr>
-           
-      </table>
+      <div>
+        <label>Escolha o arquivo de configuração da iluminação.</label>
+        <input type="file" id="lightFile" />
+      </div>
+
+      <div>
+        <label>Escolha o arquivo de objeto.</label>
+        <input type="file" id="objectFile" />
+      </div>
+      
     </div>
+
+    <div id="log">
+      <div id="chosencamera"></div>
+      <div id="chosenlight"></div>
+      <div id="chosenobject"></div>
+    </div>
+
   </body>
 </html>

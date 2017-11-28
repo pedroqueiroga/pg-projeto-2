@@ -2,11 +2,25 @@ body{
 	display: flex;
 }
 #options{
-	width: 20vw;
+	width: 25vw;
+	height: 100vh;
+	padding: 0;
+	margin: 0;
+	font-size: 20px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+
+#log{
+	width: 80vw;
 	height: 100vh;
 	padding: 0;
 	margin: 0;
 }
+
 pre {
 	outline: 1px solid #ccc;
 	padding: 5px;
