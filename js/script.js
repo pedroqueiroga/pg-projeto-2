@@ -241,35 +241,24 @@ var s = function(p) {
 						 p.width, p.height);
 	}
 
-	window.ponto2d = window.ponto2d.sort();
-
-	// window.ponto2d = window.ponto2d.sort(function(a, b) {
-	//     if (a.originalVertex < b.originalVertex) {
-	// 	return -1;
-	//     }
-	//     if (a.originalVertex > b.originalVertex) {
-	// 	return 1;
-	//     }
-	//     return 0;
-	// });
-
 	window.zBuffer = createArray(p.width, p.height);
 	for (var i = 0; i < window.zBuffer.length; i++) {
 	    window.zBuffer[i] = window.zBuffer[i].fill(Infinity);
 	}
+	renderObj();
     };
 
     p.draw = function() {
-	var fps = p.frameRate();
-	p.clear();
-	window.zBuffer = createArray(p.width, p.height);
-	for (var i = 0; i < window.zBuffer.length; i++) {
-	    window.zBuffer[i] = window.zBuffer[i].fill(Infinity);
-	}
-	p.fill(255);
-	p.stroke(0);
-	p.text("FPS: " + fps.toFixed(2), 10, 10);
-	renderObj();
+	// var fps = p.frameRate();
+	// p.clear();
+	// window.zBuffer = createArray(p.width, p.height);
+	// for (var i = 0; i < window.zBuffer.length; i++) {
+	//     window.zBuffer[i] = window.zBuffer[i].fill(Infinity);
+	// }
+	// p.fill(255);
+	// p.stroke(0);
+	// p.text("FPS: " + fps.toFixed(2), 10, 10);
+	// renderObj();
     };
 
     function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
@@ -321,41 +310,50 @@ var s = function(p) {
 			  objVa.N.z * lp.u +
 			  objVb.N.z * lp.v);
 	}
-	if (P.z <= window.zBuffer[xf][scanlineY]) {
+	if (xf >= 0 && scanlineY >= 0 &&
+	    xf < p.width && scanlineY < p.height &&
+	    P.z <= window.zBuffer[xf][scanlineY]) {
 	    if (P.z <= -1000) {
 		debugger;
 	    }
 	    window.zBuffer[xf][scanlineY] = P.z;
-	    // var N = new Vetor(window.objeto.V[a].N.x * lp.u +
-	    // 		      window.objeto.V[b].N.x * lp.v,
-	    // 		      window.objeto.V[a].N.y * lp.u +
-	    // 		      window.objeto.V[b].N.y * lp.v ,
-	    // 		      window.objeto.V[a].N.z * lp.u +
-	    // 		      window.objeto.V[b].N.z * lp.v,
-	    // 		      true);
-	    N = N.normalizado();
-	    var L = window.iluminacao.Pl.menos(P).normalizado();
-	    var V = new Vetor(-P.x, -P.y, -P.z).normalizado();
-	    var R = (N.produtoEscalar(((N.produtoInterno(L)) * 2))).menos(L);
-	    var ka = window.iluminacao.ka;
-	    var ks = window.iluminacao.ks;
-	    var kd = window.iluminacao.kd;
-	    if (V.produtoInterno(N) < 0) {
-		N = N.produtoEscalar(-1);
-	    }
-	    if (L.produtoInterno(N) < 0) {
-		kd = 0;
-		ks = 0;
-	    }
-	    if (R.produtoInterno(V) < 0) {
-		ks = 0;
-	    }
-	    var I = window.iluminacao.Ia.produtoEscalar(ka)
-		.mais((window.iluminacao.Od.produtoEscalar(L.produtoInterno(N) * kd)).produtoComponentes(window.iluminacao.Il))
-		.mais(window.iluminacao.Il.produtoEscalar(Math.pow(R.produtoInterno(V), window.iluminacao.n) * ks));
-	    p.stroke(Math.floor(I.x), Math.floor(I.y), Math.floor(I.z));
-	    p.point(xf, scanlineY);
+
+	    phong(N, P, xf, scanlineY);
 	}
+    }
+
+    function phong(N, P, xf, y) {
+
+	N = N.normalizado();
+	var L = window.iluminacao.Pl.menos(P).normalizado();
+	var V = new Vetor(-P.x, -P.y, -P.z).normalizado();
+	var R = (N.produtoEscalar(((N.produtoInterno(L)) * 2))).menos(L);
+	R = R.normalizado();
+	var ka = window.iluminacao.ka;
+	var ks = window.iluminacao.ks;
+	var kd = window.iluminacao.kd;
+	var Ia = window.iluminacao.Ia;
+	var Od = window.iluminacao.Od;
+	var Il = window.iluminacao.Il;
+	var n = window.iluminacao.n;
+	if (V.produtoInterno(N) < 0) {
+	    N = N.produtoEscalar(-1);
+	}
+	if (L.produtoInterno(N) < 0) {
+	    kd = 0;
+	    ks = 0;
+	}
+	if (R.produtoInterno(V) < 0) {
+	    ks = 0;
+	}
+	var I = Ia.produtoEscalar(ka)
+	    .mais((Od.produtoEscalar(L.produtoInterno(N) * kd)).produtoComponentes(Il))
+	    .mais(Il.produtoEscalar(Math.pow(R.produtoInterno(V), n) * ks));
+	I.x = Math.min(I.x, 255);
+	I.y = Math.min(I.y, 255);
+	I.z = Math.min(I.z, 255);
+	p.stroke(Math.floor(I.x), Math.floor(I.y), Math.floor(I.z));
+	p.point(xf, y);
     }
 
     function zBufVertical(xf, y, v1, v2, a, b, P4, N4) {
@@ -407,48 +405,22 @@ var s = function(p) {
 			  objVa.N.z * lp.u +
 			  objVb.N.z * lp.v);
 	}
-	if (P.z <= window.zBuffer[xf][y]) {
+	if (xf >= 0 && y >= 0 &&
+	    xf < p.width && y < p.height &&
+	    P.z <= window.zBuffer[xf][y]) {
 	    if (P.z <= -1000) {
 		debugger;
 	    }
 	    window.zBuffer[xf][y] = P.z;
-	    // var N = new Vetor(window.objeto.V[a].N.x * lp.u +
-	    // 		      window.objeto.V[b].N.x * lp.v,
-	    // 		      window.objeto.V[a].N.y * lp.u +
-	    // 		      window.objeto.V[b].N.y * lp.v ,
-	    // 		      window.objeto.V[a].N.z * lp.u +
-	    // 		      window.objeto.V[b].N.z * lp.v,
-	    // 		      true);
-	    N = N.normalizado();
-	    var L = window.iluminacao.Pl.menos(P).normalizado();
-	    var V = new Vetor(-P.x, -P.y, -P.z).normalizado();
-	    var R = (N.produtoEscalar(((N.produtoInterno(L)) * 2))).menos(L);
-	    var ka = window.iluminacao.ka;
-	    var ks = window.iluminacao.ks;
-	    var kd = window.iluminacao.kd;
-	    if (V.produtoInterno(N) < 0) {
-		N = N.produtoEscalar(-1);
-	    }
-	    if (L.produtoInterno(N) < 0) {
-		kd = 0;
-		ks = 0;
-	    }
-	    if (R.produtoInterno(V) < 0) {
-		ks = 0;
-	    }
-	    var I = window.iluminacao.Ia.produtoEscalar(ka)
-		.mais((window.iluminacao.Od.produtoEscalar(L.produtoInterno(N) * kd)).produtoComponentes(window.iluminacao.Il))
-		.mais(window.iluminacao.Il.produtoEscalar(Math.pow(R.produtoInterno(V), window.iluminacao.n) * ks));
-	    p.stroke(Math.floor(I.x), Math.floor(I.y), Math.floor(I.z));
-	    p.point(xf, y);
+	    phong(N, P, xf, y);
 	}
     }
 
     function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
-	var bar = baricentro(new Ponto(xf, scanlineY, 0, true),
-			     new Ponto(v1.x, v1.y, 0, true),
-			     new Ponto(v2.x, v2.y, 0, true),
-			     new Ponto(v3.x, v3.y, 0, true));
+	var bar = baricentro(new Ponto2d(xf, scanlineY),
+			     v1,
+			     v2,
+			     v3);
 	var P, N;
 	var objVa, objVb, objVc;
 	if (a === null) {
@@ -552,44 +524,14 @@ var s = function(p) {
 	    
 	   
 	}
-	if (P.z <= window.zBuffer[xf][scanlineY]) {
+	if (xf >= 0 && scanlineY >= 0 &&
+	    xf < p.width && scanlineY < p.height &&
+	    P.z <= window.zBuffer[xf][scanlineY]) {
 	    if (P.z <= -1000) {
 		debugger;
 	    }
 	    window.zBuffer[xf][scanlineY] = P.z;
-
-	    // N = new Vetor(window.objeto.V[a].N.x * bar.u +
-	    // 		  window.objeto.V[b].N.x * bar.v +
-	    // 		  window.objeto.V[c].N.x * bar.w,
-	    // 		  window.objeto.V[a].N.y * bar.u +
-	    // 		  window.objeto.V[b].N.y * bar.v +
-	    // 		  window.objeto.V[c].N.y * bar.w,
-	    // 		  window.objeto.V[a].N.z * bar.u +
-	    // 		  window.objeto.V[b].N.z * bar.v +
-	    // 		  window.objeto.V[c].N.z * bar.w,
-	    // 		  true);
-	    N = N.normalizado();
-	    var L = window.iluminacao.Pl.menos(P).normalizado();
-	    var V = new Vetor(-P.x, -P.y, -P.z).normalizado();
-	    var R = (N.produtoEscalar(((N.produtoInterno(L)) * 2))).menos(L);
-	    var ka = window.iluminacao.ka;
-	    var ks = window.iluminacao.ks;
-	    var kd = window.iluminacao.kd;
-	    if (V.produtoInterno(N) < 0) {
-		N = N.produtoEscalar(-1);
-	    }
-	    if (L.produtoInterno(N) < 0) {
-		kd = 0;
-		ks = 0;
-	    }
-	    if (R.produtoInterno(V) < 0) {
-		ks = 0;
-	    }
-	    var I = window.iluminacao.Ia.produtoEscalar(ka)
-		.mais((window.iluminacao.Od.produtoEscalar(L.produtoInterno(N) * kd)).produtoComponentes(window.iluminacao.Il))
-		.mais(window.iluminacao.Il.produtoEscalar(Math.pow(R.produtoInterno(V), window.iluminacao.n) * ks));
-	    p.stroke(Math.floor(I.x), Math.floor(I.y), Math.floor(I.z));
-	    p.point(xf, scanlineY);
+	    phong(N, P, xf, scanlineY);
 	}
 
     }
@@ -678,21 +620,11 @@ var s = function(p) {
 
     // encontra as coordenadas baricentricas
     function baricentro(p, a, b, c) {
-	var v0 = b.menos(a, true);
-	var v1 = c.menos(a, true);
-	var v2 = p.menos(a, true);
-	// cramer
-	var d00 = v0.produtoInterno(v0);
-	var d01 = v0.produtoInterno(v1);
-	var d11 = v1.produtoInterno(v1);
-	var d20 = v2.produtoInterno(v0);
-	var d21 = v2.produtoInterno(v1);
-	var denom = d00 * d11 - d01 * d01;
-	if (denom == 0) {
-	    //debugger; // linhas diagonais :/
-	}
-	var v = (d11 * d20 - d01 * d21) / denom;
-	var w = (d00 * d21 - d01 * d20) / denom;
+	debugger;
+	var v0 = b.menos(a), v1 = c.menos(a), v2 = p.menos(a);
+	var den = v0.x * v1.y - v1.x * v0.y;
+	var v = (v2.x * v1.y - v1.x * v2.y) / den;
+	var w = (v0.x * v2.y - v2.x * v0.y) / den;
 	var u = 1 - v - w;
 	return {u, v, w};
     }

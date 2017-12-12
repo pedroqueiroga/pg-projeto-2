@@ -10,23 +10,26 @@ class Ponto2d {
 	this.y = y;
 	this.originalVertex = i;
     }
+    
+    menos(p2) {
+	var p = new Ponto2d(this.x - p2.x,
+			    this.y - p2.y);
+	return p;
+    }
 
     static threeDPD(ponto3d, i, width, height) {
-	// xp = x/(z*d), onde d é a distância
-	// da origem pro plano de projeção, aqui 1.
-	var watX = ponto3d.x/(ponto3d.z);
-	var watY = ponto3d.y/(ponto3d.z);
-	
-	// normalizar x e y pro espaço [0, 1]
-	// o que está sendo feito aqui é (P'.x + width/2)/width
-	// do espaço, que como era [-1, 1], width é 2.
-	// mesma coisa pra y.
-	watX = (watX + 1) / 2;
-	watY = (watY + 1) / 2;
 
-	// desnormalizar pro canvas!
-	watX = Math.floor(watX * width);
-	watY = Math.floor((1 - watY) * height);
+	//Para cada ponto do objeto, projete-o para coordenadas de tela 2D, sem descartar os pontos em coordenadas de vista 3D:
+	// a linha abaixo gera os pontos 2D parametrizados no intervalo [-1, 1]:
+	//P_objeto_tela = ((d/hx)*(P_objeto_vista.x/P_objeto_vista.z), (d/hy)*(P_objeto_vista.y/P_objeto_vista.z))
+	var watX = ((window.camera.d/window.camera.h.x)*(ponto3d.x/ponto3d.z));
+	var watY = ((window.camera.d/window.camera.h.y)*(ponto3d.y/ponto3d.z));
+	// em seguida parametrizamos os pontos para as dimensões da janela (intervalos [0, width] e [0, height]) ,
+	// transformando tudo em inteiro, podendo descartar os pontos gerados no intervalo [-1, 1].
+	//P_objeto_tela.x = (int)((P_objeto_tela.x + 1) * width / 2)
+	//P_objeto_tela.y = (int)((1 - P_objeto_tela.y) * height / 2) 
+	watX = Math.floor((watX + 1) * width / 2);
+	watY = Math.floor((1 - watY) * height / 2);
 
 	return new Ponto2d(watX, watY, i);
     }
