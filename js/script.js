@@ -233,6 +233,7 @@ var s = function(p) {
 
     p.setup = function() {
         p.createCanvas(1024, 768);
+	p.background(128);
 
 	// projetar pontos pra coordenadas da tela
 	window.ponto2d = createArray(window.objeto.V.length);
@@ -364,7 +365,7 @@ var s = function(p) {
 	I.x = Math.min(I.x, 255);
 	I.y = Math.min(I.y, 255);
 	I.z = Math.min(I.z, 255);
-	p.stroke(Math.floor(I.x), Math.floor(I.y), Math.floor(I.z));
+	p.stroke(Math.round(I.x), Math.round(I.y), Math.round(I.z));
 //	p.stroke(Math.floor(Math.abs(N.x) * 255), Math.floor(Math.abs(N.y) * 255), Math.floor(Math.abs(N.z) * 255));
 	p.point(xf, y);
     }
@@ -601,7 +602,7 @@ var s = function(p) {
 		var x = curx1 < curx2 ? curx1 : curx2;
 		var span = Math.abs(curx1 - curx2);
 		for (var i = 0; i <= span; i++, x++) {
-		    var xf = Math.floor(x);
+		    var xf = Math.round(x);
 		    if (xf < p.width && scanlineY < p.height &&
 			xf >= 0 && scanlineY >= 0) {
 			zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P, N);
@@ -694,7 +695,7 @@ var s = function(p) {
 		var x = curx1 < curx2 ? curx1 : curx2;
 		var span = Math.abs(curx1 - curx2);
 		for (var i = 0; i <= span; i++, x++) {
-		    var xf = Math.floor(x);
+		    var xf = Math.round(x);
 		    if (xf < p.width && scanlineY < p.height &&
 			xf >= 0 && scanlineY >= 0) {
 			zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P, N);
@@ -731,7 +732,7 @@ var s = function(p) {
 	    debugger;
 	    //general case - split the triangle in a topflat and bottom-flat one
 	    var v4 = new Ponto2d(
-		Math.floor((v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x))), v2.y);
+		Math.round((v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x))), v2.y);
 	    var lp = baricentro(v4, v1, v2, v3);
 	    var P = new Ponto(window.objeto.V[v1.originalVertex].x * lp.u +
 			      window.objeto.V[v2.originalVertex].x * lp.v +
