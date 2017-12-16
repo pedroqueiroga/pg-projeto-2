@@ -60,3 +60,26 @@ Matriz.prototype.inversa = function() {
     var m = new Matriz(v1, v2, v3);
     return m;
 };
+
+/******************/
+function vetorMatriz4d(vetor, matriz) {
+    var vec = {x: vetor.x, y: vetor.y, z: vetor.z, w: 1};
+    var mat = {a: matriz.a, b: matriz.b, c: matriz.c, d: 0,
+	       e: matriz.d, f: matriz.e, g: matriz.f, h: 0,
+	       i: matriz.g, j: matriz.h, k: matriz.i, l: 0,
+	       m: 0, n: 0, o: 0, p: 1};
+    return new Ponto(mat.a * vec.x + mat.b * vec.y + mat.c * vec.z,
+		     mat.e * vec.x + mat.f * vec.y + mat.g * vec.z,
+		     mat.i * vec.x + mat.j * vec.y + mat.k * vec.z);
+}
+
+function vvetorMatriz4d(vetor, matriz) {
+    var vec = {x: vetor.x, y: vetor.y, z: vetor.z, w: 1};
+    var mat = {a: matriz.a, b: matriz.b, c: matriz.c, d: 0,
+	       e: matriz.d, f: matriz.e, g: matriz.f, h: 0,
+	       i: matriz.g, j: matriz.h, k: matriz.i, l: 0,
+	       m: 0, n: 0, o: 0, p: 1};
+    return new Vetor(mat.a * vec.x + mat.b * vec.y + mat.c * vec.z,
+		     mat.e * vec.x + mat.f * vec.y + mat.g * vec.z,
+		     mat.i * vec.x + mat.j * vec.y + mat.k * vec.z);
+}

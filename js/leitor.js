@@ -145,9 +145,9 @@ Leitor.prototype.lerIluminacao = function() {
 	
 	kd = this.proximoFloat();
 
-	x = this.proximoInt();
-	y = this.proximoInt();
-	z = this.proximoInt();
+	x = this.proximoFloat();
+	y = this.proximoFloat();
+	z = this.proximoFloat();
 	Od = new Vetor(x, y, z);
 	
 	ks = this.proximoFloat();

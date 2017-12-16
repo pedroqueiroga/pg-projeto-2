@@ -12,7 +12,7 @@ function Camera(values) {
 
     this.N = (values.N).normalizado();
 
-    this.U = (this.N).produtoVetorial(this.V);
+    this.U = (this.N).produtoVetorial(this.V).normalizado();
 
     this.h = values.h;
     this.d = values.d;

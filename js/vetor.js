@@ -1,4 +1,4 @@
-function Vetor(x, y, z) {
+function Vetor(x, y, z, NoN) {
     if (typeof x !== 'number' ||
 	typeof y !== 'number' ||
 	typeof z !== 'number') {
@@ -10,7 +10,9 @@ function Vetor(x, y, z) {
     this.x = x;
     this.y = y;
     this.z = z;
-    this.norma = Math.sqrt(this.produtoInterno(this));
+    if (!NoN) {
+	this.norma = Math.sqrt(this.produtoInterno(this));
+    }
 }
 
 Vetor.prototype.igual = function(v2) {
@@ -49,14 +51,15 @@ Vetor.prototype.produtoEscalar = function(escalar) {
     return v;
 };
 
-Vetor.prototype.produtoComponentes = function(v2) {
+Vetor.prototype.produtoComponentes = function(v2, NoN) {
     if (!(v2 instanceof Vetor)) {
 	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }
     var v = new Vetor(this.x * v2.x,
 		      this.y * v2.y,
-		      this.z * v2.z);
+		      this.z * v2.z,
+		      NoN);
     return v;
 };
 

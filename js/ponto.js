@@ -1,24 +1,26 @@
-function Ponto(x, y, z) {
-    if (typeof x !== 'number' ||
-	typeof y !== 'number' ||
-	typeof z !== 'number') {
-	console.log('x: ' + x + '\n' +
-		    'y: ' + y + '\n' +
-		    'z: ' + z);
-	throw 'Não é um ponto';
-    }
+function Ponto(x, y, z, NoN) {
+    // if (typeof x !== 'number' ||
+    // 	typeof y !== 'number' ||
+    // 	typeof z !== 'number') {
+    // 	console.log('x: ' + x + '\n' +
+    // 		    'y: ' + y + '\n' +
+    // 		    'z: ' + z);
+    // 	throw 'Não é um ponto';
+    // }
     this.x = x;
     this.y = y;
     this.z = z;
-
-    this.N = new Vetor(0, 0, 0);
+    if (!NoN) {
+	this.N = new Vetor(0, 0, 0);
+    }
 }
 
-Ponto.prototype.menos = function(pv2) {
+Ponto.prototype.menos = function(pv2, NoN) {
     if (pv2 instanceof Ponto) {
 	var v = new Vetor(this.x - pv2.x,
 			  this.y - pv2.y,
-			  this.z - pv2.z);
+			  this.z - pv2.z,
+			  NoN);
 	return v;
     } else if (pv2 instanceof Vetor) {
 	// mesma coisa que ponto + (-v)
@@ -37,7 +39,7 @@ Ponto.prototype.mais = function(v2) {
 	console.log('v2: ' + JSON.stringify(v2));
 	throw 'v2 não é um vetor';
     }
-    var p = new Point(this.x + v2.x,
+    var p = new Ponto(this.x + v2.x,
 		      this.y + v2.y,
 		      this.z + v2.z);
     return p;
@@ -52,3 +54,10 @@ Ponto.prototype.distancia = function(p2) {
     const dy = this.y - p2.y;
     return Math.sqrt(dx * dx + dy * dy);
 };
+
+Ponto.prototype.vezes = function(escalar) {
+    var p = new Ponto(this.x + escalar,
+		      this.y + escalar,
+		      this.z + escalar);
+    return p;
+}
