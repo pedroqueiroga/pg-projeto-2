@@ -36,9 +36,6 @@ function leArquivos() {
 	window.MMBcamera = new Matriz((window.camera).U,
 				      (window.camera).V,
 				      (window.camera).N);
-	// output(syntaxHighlight(
-	//     JSON.stringify(window.camera, null, 4)),
-	//        'chosencamera');
     } catch (err) {
 	window.alert(err);
     }
@@ -46,9 +43,6 @@ function leArquivos() {
 	leitor = new Leitor(window.lightFileTxt);
 	window.iluminacao = null;
 	window.iluminacao = leitor.lerIluminacao();
-	// output(syntaxHighlight(
-	//     JSON.stringify(window.iluminacao, null, 4)
-	// ), 'chosenlight');
     } catch (err) {
 	window.alert(err);
     }
@@ -56,9 +50,6 @@ function leArquivos() {
 	leitor = new Leitor(window.objFileTxt);
 	window.objeto = null;
 	window.objeto = leitor.lerObjeto();
-	// output(syntaxHighlight(
-	//     JSON.stringify(window.objeto, null, 4)),
-	//        'chosenobject');
     } catch (err) {
 	window.alert(err);
     }
@@ -109,58 +100,10 @@ function initialSteps() {
     }
     console.log('ok');
 
-    // output(syntaxHighlight(
-    // 	JSON.stringify(window.iluminacao, null, 4)), 'chosenlight');
-    // output(syntaxHighlight(
-    // 	JSON.stringify(window.objeto, null, 4)), 'chosenobject');
-
     if (window.myp5) {
 	window.myp5.remove();
     }
     window.myp5 = new p5(s);
-    // projetar pontos pra coordenadas da tela
-    // window.ponto2d = createArray(window.objeto.V.length);
-    // for (i = 0; i < (window.objeto.V.length); i++) {
-    // 	window.ponto2d[i] = Ponto2d.threeDPD(window.objeto.V[i], i,
-    // 					     1024, 768);
-    // }
-    
-    // //window.ponto2d = Ponto2d.sortPoints(window.ponto2d);
-    // // vou fazer sort por faces para visualizar por enquanto
-    // window.ponto2d = window.ponto2d.sort(function(a, b) {
-    // 	if (a.originalVertex < b.originalVertex) {
-    // 	    return -1;
-    // 	}
-    // 	if (a.originalVertex > b.originalVertex) {
-    // 	    return 1;
-    // 	}
-    // 	return 0;
-    // });
-    // drawy();
-}
-
-function drawy() {
-    var canvas = document.getElementById('cv');
-    var ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, ctx.width, ctx.height);
-    var points = window.ponto2d;
-    var faces = window.objeto.F;
-    ctx.beginPath();
-    for (var i = 0; i < 100; i++) {
-	// de a pra b
-     	ctx.moveTo(points[faces[i].a].x, points[faces[i].a].y);
-     	ctx.lineTo(points[faces[i].b].x, points[faces[i].b].y);
-     	ctx.stroke();
-    // 	// de b pra c
-    // 	ctx.moveTo(points[faces[i].b].x, points[faces[i].b].y);
-    // 	ctx.lineTo(points[faces[i].c].x, points[faces[i].c].y);
-    // 	ctx.stroke();
-    // 	// de c pra a
-    // 	ctx.moveTo(points[faces[i].c].x, points[faces[i].c].y);
-    // 	ctx.lineTo(points[faces[i].a].x, points[faces[i].a].y);
-    // 	ctx.stroke();
-    }
-    window.requestAnimationFrame(drawy);
 }
 
 function fileReadingRoutine(evt) {
@@ -188,33 +131,6 @@ function fileReadingRoutine(evt) {
     
     // lê o arquivo como texto, eventualmente invocando a função acima
     fileReader.readAsText(fileTobeRead);
-}
-
-function syntaxHighlight(json) {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;')
-	.replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-        var cls = 'number';
-        if (/^"/.test(match)) {
-            if (/:$/.test(match)) {
-                cls = 'key';
-            } else {
-                cls = 'string';
-            }
-        } else if (/true|false/.test(match)) {
-            cls = 'boolean';
-        } else if (/null/.test(match)) {
-            cls = 'null';
-        }
-        return '<span class="' + cls + '">' + match + '</span>';
-    });
-}
-
-function output(inp, id) {
-    var div = document.getElementById(id);
-    div.innerHTML = '';
-    div.appendChild(document.createElement('pre'))
-	.innerHTML = inp;
 }
 
 function createArray(length) {
@@ -249,24 +165,8 @@ var s = function(p) {
 	renderObj();
     };
 
-    p.draw = function() {
-	// var fps = p.frameRate();
-	// p.clear();
-	// window.zBuffer = createArray(p.width, p.height);
-	// for (var i = 0; i < window.zBuffer.length; i++) {
-	//     window.zBuffer[i] = window.zBuffer[i].fill(Infinity);
-	// }
-	// p.fill(255);
-	// p.stroke(0);
-	// p.text("FPS: " + fps.toFixed(2), 10, 10);
-	// renderObj();
-    };
-
     function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
 	var lp = lerp(xf, v1, v2);
-	if (typeof a == 'undefined' || typeof b == 'undefined') {
-	   // debugger;
-	}
 	var P, N;
 	var objVa, objVb;
 	if (!a && a != 0) {
@@ -283,20 +183,20 @@ var s = function(p) {
 	}
 	if (isNaN(lp.v)) {
 	    if (objVa.z <= objVb.z) {
-		    P = new Ponto(objVa.x,
-				  objVa.y,
-				  objVa.z);
-		    N = new Vetor(objVa.N.x,
-				  objVa.N.y,
-				  objVa.N.z);
-		} else {
-		    P = new Ponto(objVb.x,
-				  objVb.y,
-				  objVb.z);
-		    N = new Vetor(objVb.N.x,
-				  objVb.N.y,
-				  objVb.N.z);
-		}
+		P = new Ponto(objVa.x,
+			      objVa.y,
+			      objVa.z);
+		N = new Vetor(objVa.N.x,
+			      objVa.N.y,
+			      objVa.N.z);
+	    } else {
+		P = new Ponto(objVb.x,
+			      objVb.y,
+			      objVb.z);
+		N = new Vetor(objVb.N.x,
+			      objVb.N.y,
+			      objVb.N.z);
+	    }
 	} else {
 	    P = new Ponto(objVa.x * lp.u +
 			  objVb.x * lp.v,
@@ -351,30 +251,21 @@ var s = function(p) {
 	}
 
 	var OdIl = Od.produtoComponentes(Il);
-	// var I = Ia.produtoEscalar(ka)
-	//     .mais((Od.produtoEscalar(L.produtoInterno(N) * kd)).produtoComponentes(Il))
-	//     .mais(Il.produtoEscalar(Math.pow(R.produtoInterno(V), n) * ks));
-
 	var Iamb = Ia.produtoEscalar(ka);
-
 	var Is = OdIl.produtoEscalar(kd * cosLN);
 	var Id = Il.produtoEscalar(ks * Math.pow(cosRV, n));
-
 
 	var I = Iamb.mais(Id).mais(Is);
 	I.x = Math.min(I.x, 255);
 	I.y = Math.min(I.y, 255);
 	I.z = Math.min(I.z, 255);
 	p.stroke(Math.round(I.x), Math.round(I.y), Math.round(I.z));
-//	p.stroke(Math.floor(Math.abs(N.x) * 255), Math.floor(Math.abs(N.y) * 255), Math.floor(Math.abs(N.z) * 255));
+	//	p.stroke(Math.floor(Math.abs(N.x) * 255), Math.floor(Math.abs(N.y) * 255), Math.floor(Math.abs(N.z) * 255));
 	p.point(xf, y);
     }
 
     function zBufVertical(xf, y, v1, v2, a, b, P4, N4) {
 	var lp = lerp(y, v1, v2);
-	if (typeof a == 'undefined' || typeof b == 'undefined') {
-	   // debugger;
-	}
 	var P, N;
 	var objVa, objVb;
 	if (!a && a != 0) {
@@ -391,20 +282,20 @@ var s = function(p) {
 	}
 	if (isNaN(lp.v)) {
 	    if (objVa.z <= objVb.z) {
-		    P = new Ponto(objVa.x,
-				  objVa.y,
-				  objVa.z);
-		    N = new Vetor(objVa.N.x,
-				  objVa.N.y,
-				  objVa.N.z);
-		} else {
-		    P = new Ponto(objVb.x,
-				  objVb.y,
-				  objVb.z);
-		    N = new Vetor(objVb.N.x,
-				  objVb.N.y,
-				  objVb.N.z);
-		}
+		P = new Ponto(objVa.x,
+			      objVa.y,
+			      objVa.z);
+		N = new Vetor(objVa.N.x,
+			      objVa.N.y,
+			      objVa.N.z);
+	    } else {
+		P = new Ponto(objVb.x,
+			      objVb.y,
+			      objVb.z);
+		N = new Vetor(objVb.N.x,
+			      objVb.N.y,
+			      objVb.N.z);
+	    }
 	} else {
 	    P = new Ponto(objVa.x * lp.u +
 			  objVb.x * lp.v,
@@ -455,7 +346,7 @@ var s = function(p) {
 	} else {
 	    objVc = window.objeto.V[c];
 	}
-	    
+	
 	if (isNaN(bar.u) || isNaN(bar.v) || isNaN(bar.w)) {
 	    // diagonal
 	    var lp1 = lerp2d({x: xf, y: scanlineY},
@@ -537,7 +428,7 @@ var s = function(p) {
 	    		  objVb.N.z * bar.v +
 	    		  objVc.N.z * bar.w);
 	    
-	   
+	    
 	}
 	if (xf >= 0 && scanlineY >= 0 &&
 	    xf < p.width && scanlineY < p.height &&
@@ -611,14 +502,11 @@ var s = function(p) {
 		curx1 += invslope1;
 		curx2 += invslope2;
 	    }
-	 }
+	}
     }
 
     function lerp(p, a, b) {
 	var v = Math.abs((p-b)/(a-b));
-	// if ((a-b) == 0) {
-	//     v = 0;
-	// }
 	var u = 1 - v;
 	return {u, v};
     }
@@ -627,9 +515,6 @@ var s = function(p) {
 	// u = vol1(p,b)/vol1(a,b)
 	var v = Math.sqrt((p.x-b.x)*(p.x-b.x) + (p.y-b.y)*(p.y-b.y)) /
 	    Math.sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y));
-	// if (isNaN(u)) {
-	//     u = 0;
-	// }
 	var u = 1 - v;
 	return {u, v};
     }
@@ -704,7 +589,7 @@ var s = function(p) {
 		curx1 -= invslope1;
 		curx2 -= invslope2;
 	    }
-	 }
+	}
     }
 
     function drawTriangle(triangle) {
@@ -760,7 +645,6 @@ var s = function(p) {
     function renderObj() {
 	var faces = window.objeto.F;
 	for (const face of faces) {
-	    //debugger;
 	    drawTriangle(face);
 	}
     }
