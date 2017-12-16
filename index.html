@@ -7,20 +7,20 @@
   </head>
   <body>
     <div id="options">
-      <button type="button" id="initialSteps">botão</button>
+      <button type="button" id="initialSteps" disabled="true">botão</button>
       <div>
         <label>Escolha o arquivo de configuração da câmera.</label>
-        <input type="file" id="cameraFile">
+        <input type="file" id="cameraFile" disabled>
       </div>
         
       <div>
         <label>Escolha o arquivo de configuração da iluminação.</label>
-        <input type="file" id="lightFile" />
+        <input type="file" id="lightFile" disabled />
       </div>
 
       <div>
         <label>Escolha o arquivo de objeto.</label>
-        <input type="file" id="objectFile" />
+        <input type="file" id="objectFile" disabled />
       </div>
       
     </div>
@@ -39,5 +39,6 @@
   <script type="text/javascript" src="js/matriz.js"></script>
   <script type="text/javascript" src="js/ponto2d.js"></script>
   <script type="text/javascript" src="js/p5/p5.min.js"></script>
+  <script type="text/javascript" src="js/p5/addons/p5.sound.js"></script>
   <script type="text/javascript" src="js/script.js"></script>
 </html>
