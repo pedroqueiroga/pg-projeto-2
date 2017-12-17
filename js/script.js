@@ -4,6 +4,10 @@ window.lightFileChooser = document.getElementById('lightFile');
 window.objectFileChooser = document.getElementById('objectFile');
 window.botao = document.getElementById('initialSteps');
 
+window.waitingSong = new Audio('../assets/wii.mp3');
+
+disabledButtons(true);
+
 function disabledButtons(b) {
     window.cameraFileChooser.disabled = b;
     window.lightFileChooser.disabled = b;
@@ -11,7 +15,8 @@ function disabledButtons(b) {
     window.botao.disabled = b;
 }
 
-function setup() {
+window.waitingSong.oncanplay = function() {
+    
     debugger;
 
     window.cv = document.getElementById("canvas");
@@ -29,26 +34,47 @@ function setup() {
     window.positionAttributeLocation = gl.getAttribLocation(program,
 							    "a_position");
 
+    window.normalAttributeLocation = gl.getAttribLocation(program,
+							  "a_normal");
+    window.pointAttributeLocation = gl.getAttribLocation(program,
+							 "a_p");
+
     window.resolutionUniformLocation = gl.getUniformLocation(program,
 							     "u_resolution");
-    window.colorAttributeLocation = gl.getAttribLocation(program, "a_color");
+    window.PlUniformLocation = gl.getUniformLocation(program,
+						     "u_Pl");
+    window.IaUniformLocation = gl.getUniformLocation(program,
+						     "u_Ia");
+    window.OdUniformLocation = gl.getUniformLocation(program,
+						     "u_Od");
+    window.IlUniformLocation = gl.getUniformLocation(program,
+						     "u_Il");
 
-    window.colorBuffer = gl.createBuffer();
 
+    window.KaUniformLocation = gl.getUniformLocation(program,
+						     "u_ka");
+    window.KsUniformLocation = gl.getUniformLocation(program,
+						     "u_ks");
+    window.KdUniformLocation = gl.getUniformLocation(program,
+						     "u_kd");
+    window.RugosidadeUniformLocation = gl.getUniformLocation(program,
+							     "u_n");
+    
     window.positionBuffer = gl.createBuffer();
+    window.normalBuffer = gl.createBuffer();
+    window.pointBuffer = gl.createBuffer();
     
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-    // Clear the canvas
-    //gl.enable(gl.SCISSOR_TEST);
-    //gl.scissor(30, 10, 60, 60);
-    // gl.clearColor(bgColor/255, bgColor/255, bgColor/255, 1.0);
-    // gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
 
     gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.enableVertexAttribArray(colorAttributeLocation);
+    gl.enableVertexAttribArray(normalAttributeLocation);
+    gl.enableVertexAttribArray(pointAttributeLocation);
+
+    gl.uniform2f(resolutionUniformLocation,
+		 gl.drawingBufferWidth,
+		 gl.drawingBufferHeight);
 
 
     // createCanvas(1024, 768);
@@ -94,6 +120,15 @@ function leArquivos() {
 	leitor = new Leitor(window.lightFileTxt);
 	window.iluminacao = null;
 	window.iluminacao = leitor.lerIluminacao();
+	var OdIl = window.iluminacao.Od.produtoComponentes(window.iluminacao.Il);
+	var Iamb = window.iluminacao.Ia.produtoEscalar(window.iluminacao.ka);
+	var Is = OdIl.produtoEscalar(0.5 * window.iluminacao.kd);
+	var Id = window.iluminacao.Il.produtoEscalar(Math.pow(0.5, window.iluminacao.n) * window.iluminacao.ks);
+	var I = Iamb.mais(Is).mais(Id);
+
+	document.getElementsByTagName("body")[0].style.background =
+	    "rgb(" + Math.min(I.x, 255) + "," + Math.min(I.y, 255) +
+	    "," + Math.min(I.z, 255) + ")";
     } catch (err) {
 	window.alert(err);
     }
@@ -156,6 +191,39 @@ function initialStep() {
 	// normalizando as normais dos vértices
 	window.objeto.V[i].N = (window.objeto.V[i].N).normalizado();
     }
+
+    gl.uniform3f(PlUniformLocation,
+		 window.iluminacao.Pl.x,
+		 window.iluminacao.Pl.y,
+		 window.iluminacao.Pl.z);
+		 
+    gl.uniform3f(IaUniformLocation,
+		 window.iluminacao.Ia.x,
+		 window.iluminacao.Ia.y,
+		 window.iluminacao.Ia.z);
+		 
+    gl.uniform3f(OdUniformLocation,
+		 window.iluminacao.Od.x,
+		 window.iluminacao.Od.y,
+		 window.iluminacao.Od.z);
+
+    gl.uniform3f(IlUniformLocation,
+		 window.iluminacao.Il.x,
+		 window.iluminacao.Il.y,
+		 window.iluminacao.Il.z);
+
+    gl.uniform1f(KaUniformLocation,
+		 window.iluminacao.ka);
+    
+    gl.uniform1f(KsUniformLocation,
+		 window.iluminacao.ks);
+    
+    gl.uniform1f(KdUniformLocation,
+		 window.iluminacao.kd);
+    
+    gl.uniform1f(RugosidadeUniformLocation,
+		 window.iluminacao.n);
+
     console.log('ok');
     setTimeout(hmmm, 0);
 }
@@ -196,10 +264,6 @@ function createArray(length) {
     return arr;
 }
 
-function preload() {
-    window.waitingSong = loadSound('../assets/wii.mp3');
-};
-
 function playit() {
     window.waitingSong.play();
 }
@@ -215,29 +279,32 @@ function hmmm() {
     }
 
     window.zBuffer = createArray(cv.width, cv.height);
+    window.nBuffer = createArray(cv.width, cv.height);
+    window.pBuffer = createArray(cv.width, cv.height);
     window.corBuffer = createArray(cv.width, cv.height);
     for (i = 0; i < window.zBuffer.length; i++) {
 	window.zBuffer[i] = window.zBuffer[i].fill(Infinity);
-	window.corBuffer[i] = window.corBuffer[i].fill([bgColor,
-							bgColor,
-							bgColor]);
     }
     renderObj();
-    var positions = [];
+    var positions = [], normals = [], points = [];
     var cores = [];
     for (i = 0; i < window.corBuffer.length; i++) {
 	for (var j = 0; j < window.corBuffer[i].length; j++) {
 	    if (window.zBuffer[i][j] < Infinity) {
 		positions.push(i);
 		positions.push(j);
-		var cor = window.corBuffer[i][j];
-		cores.push(cor[0]/255);
-		cores.push(cor[1]/255);
-		cores.push(cor[2]/255);
-		// alfa
-		cores.push(1.0);
-		// stroke(cor[0], cor[1], cor[2]);
-		// point(i, j);
+
+		var normie = window.nBuffer[i][j];
+
+		normals.push(normie.x);
+		normals.push(normie.y);
+		normals.push(normie.z);
+
+		var pt = window.pBuffer[i][j];
+
+		points.push(pt.x);
+		points.push(pt.y);
+		points.push(pt.z);
 	    }
 	}
     }
@@ -250,15 +317,22 @@ function hmmm() {
     var offset = 0;
     gl.vertexAttribPointer(
 	positionAttributeLocation, size, type, normalize, stride, offset);
-    gl.uniform2f(resolutionUniformLocation,
-		 gl.drawingBufferWidth,
-		 gl.drawingBufferHeight);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cores), gl.STATIC_DRAW);
-    size = 4;
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+    size = 3;
     gl.vertexAttribPointer(
-	colorAttributeLocation, size, type, normalize, stride, offset);
+	normalAttributeLocation, size, type, normalize, stride, offset);
+
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, pointBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW);
+    size = 3;
+    gl.vertexAttribPointer(
+	pointAttributeLocation, size, type, normalize, stride, offset);
+
+	
+
     gl.clearColor(bgColor/255, bgColor/255, bgColor/255, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, positions.length / 2);
@@ -321,8 +395,10 @@ function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
 	    debugger;
 	}
 	window.zBuffer[xf][scanlineY] = P.z;
+	window.nBuffer[xf][scanlineY] = N;
+	window.pBuffer[xf][scanlineY] = P;
 
-	phong(N, P, xf, scanlineY);
+//	phong(N, P, xf, scanlineY);
     }
 }
 
@@ -345,10 +421,6 @@ function phong(N, P, xf, y) {
     }
     var cosLN = L.produtoInterno(N);
     var cosRV = R.produtoInterno(V);
-    if (L.produtoInterno(N) < 0) {
-	kd = 0;
-	ks = 0;
-    }
     if (R.produtoInterno(V) < 0) {
 	ks = 0;
     }
@@ -422,7 +494,10 @@ function zBufVertical(xf, y, v1, v2, a, b, P4, N4) {
 	    debugger;
 	}
 	window.zBuffer[xf][y] = P.z;
-	phong(N, P, xf, y);
+	window.nBuffer[xf][y] = N;
+	window.pBuffer[xf][y] = P;
+	
+	// phong(N, P, xf, y);
     }
 }
 
@@ -542,7 +617,9 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
 	    debugger;
 	}
 	window.zBuffer[xf][scanlineY] = P.z;
-	phong(N, P, xf, scanlineY);
+	window.nBuffer[xf][scanlineY] = N;
+	window.pBuffer[xf][scanlineY] = P;
+//	phong(N, P, xf, scanlineY);
     }
 
 }
