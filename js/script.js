@@ -3,10 +3,33 @@ window.cameraFileChooser = document.getElementById('cameraFile');
 window.lightFileChooser = document.getElementById('lightFile');
 window.objectFileChooser = document.getElementById('objectFile');
 window.botao = document.getElementById('initialSteps');
+window.zPlus = document.getElementById('ZH');
+window.zMinus = document.getElementById('ZAH');
+window.yPlus = document.getElementById('YH');
+window.yMinus = document.getElementById('YAH');
+window.xPlus = document.getElementById('XH');
+window.xMinus = document.getElementById('XAH');
+window.degrees = document.getElementById('degrees');
+window.rotate = document.getElementById('rotate');
+window.rotateText = document.getElementById('rotateStack');
 
 window.waitingSong = new Audio('../assets/wii.mp3');
 
 disabledButtons(true);
+disableRotateButtons(true);
+
+window.rotationStack = [];
+
+function disableRotateButtons(b) {
+    zPlus.disabled = b;
+    zMinus.disabled = b;
+    yPlus.disabled = b;
+    yMinus.disabled = b;
+    xPlus.disabled = b;
+    xMinus.disabled = b;
+    degrees.disabled = b;
+    rotate.disabled = b;
+}
 
 function disabledButtons(b) {
     window.cameraFileChooser.disabled = b;
@@ -16,6 +39,7 @@ function disabledButtons(b) {
 }
 
 window.waitingSong.oncanplay = function() {
+    window.waitingSong.loop = true;
     
     debugger;
 
@@ -97,8 +121,114 @@ window.waitingSong.oncanplay = function() {
     } 
     else { 
 	alert("Este navegador não suporta Files");
-    } 
+    }
+    window.zPlus.addEventListener('click',
+				  rot,
+				  false);
+    window.zMinus.addEventListener('click',
+				   rot,
+				   false);
+    window.yPlus.addEventListener('click',
+				  rot,
+				  false);
+    window.yMinus.addEventListener('click',
+				   rot,
+				   false);
+    window.xPlus.addEventListener('click',
+				  rot,
+				  false);
+    window.xMinus.addEventListener('click',
+				   rot,
+				   false);
+    window.rotate.addEventListener('click',
+				   execRotate,
+				   false);
 };
+
+function rot(evt) {
+    var deg = degrees.value;
+    
+    if (isNaN(deg)) deg = 180;
+
+    deg = deg * Math.PI/180;
+    
+    var id = evt.target.id;
+    var cosine, sine;
+    cosine = Math.cos(deg);
+    sine = Math.sin(deg);
+    if (id.indexOf("AH") !== -1) {
+	sine = -sine;
+    }
+    rotationStack.push([id, sine, cosine]);
+    if (rotateText.innerHTML.length == 0) {
+	rotateText.innerHTML = "(" + id + ", " + Math.round((deg + 0.00001) * 100) / 100 + "rad)";
+    } else {
+	rotateText.innerHTML = rotateText.innerHTML + " -> " +  "(" + id + ", " + Math.round((deg + 0.00001) * 100) / 100 + "rad)";
+    }
+}
+
+function execRotate() {
+    if (rotationStack.length == 0) return;
+    playit();
+    disableRotateButtons(true);
+    // como as normais são vetores, uma classe de equipolência,
+    // não podemos transladar elas, elas estão soltas...
+
+    // o ideal seria computar o miolo e só aplicar a transalação em uma,
+    // assim não repetiríamos as contas tantas vezes, mas a ordem faz
+    // diferença, então não sei bem como evitar isso.
+    var rotMatrix = [[1, 0, 0, 0],
+	 	     [0, 1, 0, 0],
+		     [0, 0, 1, 0],
+		     [0, 0, 0, 1]];
+    var translatedRotMatrix = [[1, 0, 0, -window.objeto.V[0].x],
+	 		       [0, 1, 0, -window.objeto.V[0].y],
+			       [0, 0, 1, -window.objeto.V[0].z],
+			       [0, 0, 0, 1]];
+    while (rotationStack.length > 0) {
+	var matRot;
+	var rotation = rotationStack.pop();
+	var cosine, sine;
+	sine = rotation[1]; cosine = rotation[2];
+
+	switch (rotation[0]) {
+	case 'ZAH':
+	case 'ZH':
+	    matRot = [[cosine, sine, 0, 0],
+		      [-sine, cosine, 0, 0],
+		      [0, 0, 1, 0],
+		      [0, 0, 0, 1]];
+	    break;
+	case 'YAH':
+	case 'YH':
+	    matRot = [[cosine, 0, -sine, 0],
+		      [0, 1, 0, 0],
+		      [sine, 0, cosine, 0],
+		      [0, 0, 0, 1]];
+	    break;
+	case 'XAH':
+	case 'XH':
+	    matRot = [[1, 0, 0, 0],
+		      [0, cosine, -sine, 0],
+		      [0, sine, cosine, 0],
+		      [0, 0, 0, 1]];
+	    break;
+	}
+	rotMatrix = matrizvMatriz4d(matRot, rotMatrix);
+	translatedRotMatrix = matrizvMatriz4d(matRot, translatedRotMatrix);
+    }
+    
+    translatedRotMatrix = matrizvMatriz4d([[1, 0, 0, window.objeto.V[0].x],
+					   [0, 1, 0, window.objeto.V[0].y],
+					   [0, 0, 1, window.objeto.V[0].z],
+					   [0, 0, 0, 1]], translatedRotMatrix);
+    for (var i = 0; i < (window.objeto.V.length); i++) {
+	var N = window.objeto.V[i].N;
+	window.objeto.V[i] = vetorMatriz4d(window.objeto.V[i], translatedRotMatrix);
+	window.objeto.V[i].N = vvetorMatriz4d(N, rotMatrix);
+    }
+    setTimeout(hmmm, 0);
+}
 
 function leArquivos() {
     var leitor;
@@ -196,12 +326,12 @@ function initialStep() {
 		 window.iluminacao.Pl.x,
 		 window.iluminacao.Pl.y,
 		 window.iluminacao.Pl.z);
-		 
+    
     gl.uniform3f(IaUniformLocation,
 		 window.iluminacao.Ia.x,
 		 window.iluminacao.Ia.y,
 		 window.iluminacao.Ia.z);
-		 
+    
     gl.uniform3f(OdUniformLocation,
 		 window.iluminacao.Od.x,
 		 window.iluminacao.Od.y,
@@ -331,7 +461,7 @@ function hmmm() {
     gl.vertexAttribPointer(
 	pointAttributeLocation, size, type, normalize, stride, offset);
 
-	
+    
 
     gl.clearColor(bgColor/255, bgColor/255, bgColor/255, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -339,6 +469,9 @@ function hmmm() {
     setTimeout(function() {
 	window.waitingSong.pause();
 	disabledButtons(false);
+	disableRotateButtons(false);
+	rotationStack = [];
+	rotateText.innerHTML = "";
     }, 500);
 }
 
@@ -398,7 +531,7 @@ function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
 	window.nBuffer[xf][scanlineY] = N;
 	window.pBuffer[xf][scanlineY] = P;
 
-//	phong(N, P, xf, scanlineY);
+	//	phong(N, P, xf, scanlineY);
     }
 }
 
@@ -619,7 +752,7 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
 	window.zBuffer[xf][scanlineY] = P.z;
 	window.nBuffer[xf][scanlineY] = N;
 	window.pBuffer[xf][scanlineY] = P;
-//	phong(N, P, xf, scanlineY);
+	//	phong(N, P, xf, scanlineY);
     }
 
 }
