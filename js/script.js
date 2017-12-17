@@ -12,19 +12,58 @@ function disabledButtons(b) {
 }
 
 function setup() {
-    createCanvas(1024, 768);
-    background(bgColor);
+    debugger;
+
+    window.cv = document.getElementById("canvas");
+    // window.cv.width = window.cv.clientWidth;
+    // window.cv.height = window.cv.clientHeight;
+    window.gl = cv.getContext("webgl");
+    if (!window.gl) {
+	alert("weblg não suportado");
+    }
+
+    window.program =
+	webglUtils.createProgramFromScripts(gl,
+					    ["2d-vertex-shader",
+					     "2d-fragment-shader"]);
+    window.positionAttributeLocation = gl.getAttribLocation(program,
+							    "a_position");
+
+    window.resolutionUniformLocation = gl.getUniformLocation(program,
+							     "u_resolution");
+    window.colorAttributeLocation = gl.getAttribLocation(program, "a_color");
+
+    window.colorBuffer = gl.createBuffer();
+
+    window.positionBuffer = gl.createBuffer();
+    
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+    // Clear the canvas
+    //gl.enable(gl.SCISSOR_TEST);
+    //gl.scissor(30, 10, 60, 60);
+    // gl.clearColor(bgColor/255, bgColor/255, bgColor/255, 1.0);
+    // gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.useProgram(program);
+
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.enableVertexAttribArray(colorAttributeLocation);
+
+
+    // createCanvas(1024, 768);
+    // background(bgColor);
     // Checar suporte do browser para File
     if (window.File && window.FileReader && window.FileList && window.Blob) {
 	window.cameraFileChooser.addEventListener('change',
-					   fileReadingRoutine,
-					   false);
+						  fileReadingRoutine,
+						  false);
 	window.lightFileChooser.addEventListener('change',
-					  fileReadingRoutine,
-					  false);
+						 fileReadingRoutine,
+						 false);
 	window.objectFileChooser.addEventListener('change',
-					   fileReadingRoutine,
-					   false);
+						  fileReadingRoutine,
+						  false);
 	window.botao.addEventListener('click',
 				      initialSteps,
 				      false);
@@ -168,19 +207,61 @@ function playit() {
 
 
 function hmmm() {
-    background(bgColor);
     // projetar pontos pra coordenadas da tela
     window.ponto2d = createArray(window.objeto.V.length);
-    for (i = 0; i < (window.objeto.V.length); i++) {
+    for (var i = 0; i < (window.objeto.V.length); i++) {
 	window.ponto2d[i] = Ponto2d.threeDPD(window.objeto.V[i], i,
-					     width, height);
+					     cv.width, cv.height);
     }
 
-    window.zBuffer = createArray(width, height);
-    for (var i = 0; i < window.zBuffer.length; i++) {
+    window.zBuffer = createArray(cv.width, cv.height);
+    window.corBuffer = createArray(cv.width, cv.height);
+    for (i = 0; i < window.zBuffer.length; i++) {
 	window.zBuffer[i] = window.zBuffer[i].fill(Infinity);
+	window.corBuffer[i] = window.corBuffer[i].fill([bgColor,
+							bgColor,
+							bgColor]);
     }
     renderObj();
+    var positions = [];
+    var cores = [];
+    for (i = 0; i < window.corBuffer.length; i++) {
+	for (var j = 0; j < window.corBuffer[i].length; j++) {
+	    if (window.zBuffer[i][j] < Infinity) {
+		positions.push(i);
+		positions.push(j);
+		var cor = window.corBuffer[i][j];
+		cores.push(cor[0]/255);
+		cores.push(cor[1]/255);
+		cores.push(cor[2]/255);
+		// alfa
+		cores.push(1.0);
+		// stroke(cor[0], cor[1], cor[2]);
+		// point(i, j);
+	    }
+	}
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    var size = 2;
+    var type = gl.FLOAT;
+    var normalize = false;
+    var stride = 0;
+    var offset = 0;
+    gl.vertexAttribPointer(
+	positionAttributeLocation, size, type, normalize, stride, offset);
+    gl.uniform2f(resolutionUniformLocation,
+		 gl.drawingBufferWidth,
+		 gl.drawingBufferHeight);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cores), gl.STATIC_DRAW);
+    size = 4;
+    gl.vertexAttribPointer(
+	colorAttributeLocation, size, type, normalize, stride, offset);
+    gl.clearColor(bgColor/255, bgColor/255, bgColor/255, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.POINTS, 0, positions.length / 2);
     setTimeout(function() {
 	window.waitingSong.pause();
 	disabledButtons(false);
@@ -234,7 +315,7 @@ function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
 		      objVb.N.z * lp.v);
     }
     if (xf >= 0 && scanlineY >= 0 &&
-	xf < width && scanlineY < height &&
+	xf < cv.width && scanlineY < cv.height &&
 	P.z <= window.zBuffer[xf][scanlineY]) {
 	if (P.z <= -1000) {
 	    debugger;
@@ -281,9 +362,11 @@ function phong(N, P, xf, y) {
     I.x = Math.min(I.x, 255);
     I.y = Math.min(I.y, 255);
     I.z = Math.min(I.z, 255);
-    stroke(Math.round(I.x), Math.round(I.y), Math.round(I.z));
+    window.corBuffer[xf][y] = [Math.round(I.x),
+			       Math.round(I.y),
+			       Math.round(I.z)];
     //	p.stroke(Math.floor(Math.abs(N.x) * 255), Math.floor(Math.abs(N.y) * 255), Math.floor(Math.abs(N.z) * 255));
-    point(xf, y);
+    //point(xf, y);
 }
 
 function zBufVertical(xf, y, v1, v2, a, b, P4, N4) {
@@ -333,7 +416,7 @@ function zBufVertical(xf, y, v1, v2, a, b, P4, N4) {
 		      objVb.N.z * lp.v);
     }
     if (xf >= 0 && y >= 0 &&
-	xf < width && y < height &&
+	xf < cv.width && y < cv.height &&
 	P.z <= window.zBuffer[xf][y]) {
 	if (P.z <= -1000) {
 	    debugger;
@@ -453,7 +536,7 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
 	
     }
     if (xf >= 0 && scanlineY >= 0 &&
-	xf < width && scanlineY < height &&
+	xf < cv.width && scanlineY < cv.height &&
 	P.z <= window.zBuffer[xf][scanlineY]) {
 	if (P.z <= -1000) {
 	    debugger;
@@ -465,7 +548,7 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
 }
 
 function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
-    debugger;
+    //debugger;
     var invslope1 = (v2.x - v1.x) / (v2.y - v1.y);
     var invslope2 = (v3.x - v1.x) / (v3.y - v1.y);
 
@@ -516,7 +599,7 @@ function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 	    var span = Math.abs(curx1 - curx2);
 	    for (var i = 0; i <= span; i++, x++) {
 		var xf = Math.round(x);
-		if (xf < width && scanlineY < height &&
+		if (xf < cv.width && scanlineY < cv.height &&
 		    xf >= 0 && scanlineY >= 0) {
 		    zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P, N);
 		}
@@ -543,7 +626,7 @@ function lerp2d(p, a, b) {
 
 // encontra as coordenadas baricentricas
 function baricentro(p, a, b, c) {
-    debugger;
+    //debugger;
     var v0 = b.menos(a), v1 = c.menos(a), v2 = p.menos(a);
     var invden = 1 / (v0.x * v1.y - v1.x * v0.y);
     var v = (v2.x * v1.y - v1.x * v2.y) * invden;
@@ -553,7 +636,7 @@ function baricentro(p, a, b, c) {
 }
 
 function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
-    debugger;
+    //debugger;
     var invslope1 = (v3.x - v1.x) / (v3.y - v1.y);
     var invslope2 = (v3.x - v2.x) / (v3.y - v2.y);
 
@@ -603,7 +686,7 @@ function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 	    var span = Math.abs(curx1 - curx2);
 	    for (var i = 0; i <= span; i++, x++) {
 		var xf = Math.round(x);
-		if (xf < width && scanlineY < height &&
+		if (xf < cv.width && scanlineY < cv.height &&
 		    xf >= 0 && scanlineY >= 0) {
 		    zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P, N);
 		}
@@ -636,7 +719,7 @@ function drawTriangle(triangle) {
 	fillTopFlatTriangle(v1, v2, v3, v1.originalVertex, v2.originalVertex, v3.originalVertex);
     }
     else {
-	debugger;
+	//debugger;
 	//general case - split the triangle in a topflat and bottom-flat one
 	var v4 = new Ponto2d(
 	    Math.round((v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x))), v2.y);

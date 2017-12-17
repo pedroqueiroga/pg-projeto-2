@@ -42,3 +42,8 @@ pre {
 	color: red; 
 }
 
+canvas {
+    width: 1024px;
+    height: 768px;
+    display: block;
+}
