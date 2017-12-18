@@ -181,9 +181,9 @@ function execRotate() {
 	 	     [0, 1, 0, 0],
 		     [0, 0, 1, 0],
 		     [0, 0, 0, 1]];
-    var translatedRotMatrix = [[1, 0, 0, -window.objeto.V[0].x],
-	 		       [0, 1, 0, -window.objeto.V[0].y],
-			       [0, 0, 1, -window.objeto.V[0].z],
+    var translatedRotMatrix = [[1, 0, 0, -window.objeto.COM[0]],
+	 		       [0, 1, 0, -window.objeto.COM[1]],
+			       [0, 0, 1, -window.objeto.COM[2]],
 			       [0, 0, 0, 1]];
     while (rotationStack.length > 0) {
 	var matRot;
@@ -218,9 +218,9 @@ function execRotate() {
 	translatedRotMatrix = matrizvMatriz4d(matRot, translatedRotMatrix);
     }
     
-    translatedRotMatrix = matrizvMatriz4d([[1, 0, 0, window.objeto.V[0].x],
-					   [0, 1, 0, window.objeto.V[0].y],
-					   [0, 0, 1, window.objeto.V[0].z],
+    translatedRotMatrix = matrizvMatriz4d([[1, 0, 0, window.objeto.COM[0]],
+					   [0, 1, 0, window.objeto.COM[1]],
+					   [0, 0, 1, window.objeto.COM[2]],
 					   [0, 0, 0, 1]], translatedRotMatrix);
     for (var i = 0; i < (window.objeto.V.length); i++) {
 	var N = window.objeto.V[i].N;
@@ -266,6 +266,7 @@ function leArquivos() {
 	leitor = new Leitor(window.objFileTxt);
 	window.objeto = null;
 	window.objeto = leitor.lerObjeto();
+	window.objeto.COM = [0, 0, 0];
     } catch (err) {
 	window.alert(err);
     }
@@ -315,12 +316,21 @@ function initialStep() {
 	    .mais(window.objeto.F[i].N);
 	window.objeto.V[c].N = (window.objeto.V[c].N)
 	    .mais(window.objeto.F[i].N);
+
     }
 
     for (i = 0; i < (window.objeto.V.length); i++) {
 	// normalizando as normais dos vértices
 	window.objeto.V[i].N = (window.objeto.V[i].N).normalizado();
+
+	// calculando centroide para translação das rotações
+	window.objeto.COM[0] += window.objeto.V[i].x;
+	window.objeto.COM[1] += window.objeto.V[i].y;
+	window.objeto.COM[2] += window.objeto.V[i].z;
     }
+    window.objeto.COM[0] = window.objeto.COM[0]/window.objeto.V.length;
+    window.objeto.COM[1] = window.objeto.COM[1]/window.objeto.V.length;
+    window.objeto.COM[2] = window.objeto.COM[2]/window.objeto.V.length;
 
     gl.uniform3f(PlUniformLocation,
 		 window.iluminacao.Pl.x,
