@@ -181,14 +181,14 @@ function execRotate() {
 	 	     [0, 1, 0, 0],
 		     [0, 0, 1, 0],
 		     [0, 0, 0, 1]];
-    var toOrigin = [[1, 0, 0, -window.objeto.COM[0]],
-	 	    [0, 1, 0, -window.objeto.COM[1]],
-		    [0, 0, 1, -window.objeto.COM[2]],
+    var toOrigin = [[1, 0, 0, -window.objeto.COM.x],
+	 	    [0, 1, 0, -window.objeto.COM.y],
+		    [0, 0, 1, -window.objeto.COM.z],
 		    [0, 0, 0, 1]];
 
-    var fromOrigin = [[1, 0, 0, window.objeto.COM[0]],
-	 	      [0, 1, 0, window.objeto.COM[1]],
-		      [0, 0, 1, window.objeto.COM[2]],
+    var fromOrigin = [[1, 0, 0, window.objeto.COM.x],
+	 	      [0, 1, 0, window.objeto.COM.y],
+		      [0, 0, 1, window.objeto.COM.z],
 		      [0, 0, 0, 1]];
     
     var translatedRotMatrix = [[1, 0, 0, 0],
@@ -238,6 +238,8 @@ function execRotate() {
 	window.objeto.V[i] = vetorMatriz4d(window.objeto.V[i], translatedRotMatrix);
 	window.objeto.V[i].N = vvetorMatriz4d(N, rotMatrix);
     }
+    // rotaciona COM agora
+    window.objeto.COM = vetorMatriz4d(window.objeto.COM, translatedRotMatrix);
     setTimeout(hmmm, 0);
 }
 
@@ -277,7 +279,7 @@ function leArquivos() {
 	leitor = new Leitor(window.objFileTxt);
 	window.objeto = null;
 	window.objeto = leitor.lerObjeto();
-	window.objeto.COM = [0, 0, 0];
+	window.objeto.COM = new Ponto(0, 0, 0);
     } catch (err) {
 	window.alert(err);
     }
@@ -309,6 +311,9 @@ function initialStep() {
 				       P_objeto_vista.z);
     }
 
+    var ehUtilizado = createArray(window.objeto.V.length);
+    ehUtilizado = ehUtilizado.fill(false);
+
     for (i = 0; i < (window.objeto.F.length); i++) {
 	// criando triângulos e suas normais
 	var a, b, c;
@@ -328,20 +333,26 @@ function initialStep() {
 	window.objeto.V[c].N = (window.objeto.V[c].N)
 	    .mais(window.objeto.F[i].N);
 
+	ehUtilizado[a] = true;
+	ehUtilizado[b] = true;
+	ehUtilizado[c] = true;
     }
-
+    var qtdUtilizados = 0;
     for (i = 0; i < (window.objeto.V.length); i++) {
 	// normalizando as normais dos vértices
 	window.objeto.V[i].N = (window.objeto.V[i].N).normalizado();
 
 	// calculando centroide para translação das rotações
-	window.objeto.COM[0] += window.objeto.V[i].x;
-	window.objeto.COM[1] += window.objeto.V[i].y;
-	window.objeto.COM[2] += window.objeto.V[i].z;
+	if (ehUtilizado[i]) {
+	    qtdUtilizados++;
+	    window.objeto.COM.x += window.objeto.V[i].x;
+	    window.objeto.COM.y += window.objeto.V[i].y;
+	    window.objeto.COM.z += window.objeto.V[i].z;
+	}
     }
-    window.objeto.COM[0] = window.objeto.COM[0]/window.objeto.V.length;
-    window.objeto.COM[1] = window.objeto.COM[1]/window.objeto.V.length;
-    window.objeto.COM[2] = window.objeto.COM[2]/window.objeto.V.length;
+    window.objeto.COM.x = window.objeto.COM.x/qtdUtilizados;
+    window.objeto.COM.y = window.objeto.COM.y/qtdUtilizados;
+    window.objeto.COM.z = window.objeto.COM.z/qtdUtilizados;
 
     gl.uniform3f(PlUniformLocation,
 		 window.iluminacao.Pl.x,
