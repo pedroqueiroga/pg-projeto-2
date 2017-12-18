@@ -7,12 +7,23 @@
   </head>
   <body>
     <div id="options">
+      <button type="button" id="ZH" disabled="true">Z H.</button>
+      <button type="button" id="ZAH" disabled="true">Z A.H.</button>
+      <button type="button" id="XH" disabled="true">X H.</button>
+      <button type="button" id="XAH" disabled="true">X A.H.</button>
+      <button type="button" id="YH" disabled="true">Y H.</button>
+      <button type="button" id="YAH" disabled="true">Y A.H.</button>
+      <button type="button" id="rotate" disabled="true">EXECUTAR ROTAÇÕES</button>
+      <div class="tooltip options">
+	<input id="degrees"></input>
+	<span class="tooltiptext">Ângulo em graus</span>
+      </div>
       <button type="button" id="initialSteps" disabled="true">botão</button>
       <div>
         <label>Escolha o arquivo de configuração da câmera.</label>
         <input type="file" id="cameraFile" disabled>
       </div>
-        
+      
       <div>
         <label>Escolha o arquivo de configuração da iluminação.</label>
         <input type="file" id="lightFile" disabled />
@@ -22,7 +33,7 @@
         <label>Escolha o arquivo de objeto.</label>
         <input type="file" id="objectFile" disabled />
       </div>
-      
+      <div id="rotateStack"></div>
     </div>
 
     <div id="log">
@@ -40,5 +51,5 @@
   <script type="text/javascript" src="js/ponto2d.js"></script>
   <script type="text/javascript" src="js/p5/p5.min.js"></script>
   <script type="text/javascript" src="js/p5/addons/p5.sound.js"></script>
-  <script type="text/javascript" src="js/script.js"></script>
+  <script type="text/javascript" src="js/canvas.js"></script>
 </html>

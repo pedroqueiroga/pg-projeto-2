@@ -63,23 +63,33 @@ Matriz.prototype.inversa = function() {
 
 /******************/
 function vetorMatriz4d(vetor, matriz) {
-    var vec = {x: vetor.x, y: vetor.y, z: vetor.z, w: 1};
-    var mat = {a: matriz.a, b: matriz.b, c: matriz.c, d: 0,
-	       e: matriz.d, f: matriz.e, g: matriz.f, h: 0,
-	       i: matriz.g, j: matriz.h, k: matriz.i, l: 0,
-	       m: 0, n: 0, o: 0, p: 1};
-    return new Ponto(mat.a * vec.x + mat.b * vec.y + mat.c * vec.z,
-		     mat.e * vec.x + mat.f * vec.y + mat.g * vec.z,
-		     mat.i * vec.x + mat.j * vec.y + mat.k * vec.z);
+    return new Ponto(matriz[0][0] * vetor.x + matriz[0][1] * vetor.y +
+		     matriz[0][2] * vetor.z + matriz[0][3],
+		     matriz[1][0] * vetor.x + matriz[1][1] * vetor.y +
+		     matriz[1][2] * vetor.z + matriz[1][3],
+		     matriz[2][0] * vetor.x + matriz[2][1] * vetor.y +
+		     matriz[2][2] * vetor.z + matriz[2][3]);
 }
 
 function vvetorMatriz4d(vetor, matriz) {
-    var vec = {x: vetor.x, y: vetor.y, z: vetor.z, w: 1};
-    var mat = {a: matriz.a, b: matriz.b, c: matriz.c, d: 0,
-	       e: matriz.d, f: matriz.e, g: matriz.f, h: 0,
-	       i: matriz.g, j: matriz.h, k: matriz.i, l: 0,
-	       m: 0, n: 0, o: 0, p: 1};
-    return new Vetor(mat.a * vec.x + mat.b * vec.y + mat.c * vec.z,
-		     mat.e * vec.x + mat.f * vec.y + mat.g * vec.z,
-		     mat.i * vec.x + mat.j * vec.y + mat.k * vec.z);
+    return new Vetor(matriz[0][0] * vetor.x + matriz[0][1] * vetor.y +
+		     matriz[0][2] * vetor.z + matriz[0][3],
+		     matriz[1][0] * vetor.x + matriz[1][1] * vetor.y +
+		     matriz[1][2] * vetor.z + matriz[1][3],
+		     matriz[2][0] * vetor.x + matriz[2][1] * vetor.y +
+		     matriz[2][2] * vetor.z + matriz[2][3]);
+}
+
+function matrizvMatriz4d(matriz1, matriz2) {
+    var m = new Array(4);
+    for (var i = 0; i < 4; i++) {
+	m[i] = new Array(4);
+	for (var j = 0; j < 4; j++) {
+	    m[i][j] = 0;
+	    for (var k = 0; k < 4; k++) {
+		m[i][j] += matriz1[i][k] * matriz2[k][j];
+	    }
+	}
+    }
+    return m;
 }
