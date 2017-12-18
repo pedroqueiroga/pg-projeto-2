@@ -181,9 +181,19 @@ function execRotate() {
 	 	     [0, 1, 0, 0],
 		     [0, 0, 1, 0],
 		     [0, 0, 0, 1]];
-    var translatedRotMatrix = [[1, 0, 0, -window.objeto.COM[0]],
-	 		       [0, 1, 0, -window.objeto.COM[1]],
-			       [0, 0, 1, -window.objeto.COM[2]],
+    var toOrigin = [[1, 0, 0, -window.objeto.COM[0]],
+	 	    [0, 1, 0, -window.objeto.COM[1]],
+		    [0, 0, 1, -window.objeto.COM[2]],
+		    [0, 0, 0, 1]];
+
+    var fromOrigin = [[1, 0, 0, window.objeto.COM[0]],
+	 	      [0, 1, 0, window.objeto.COM[1]],
+		      [0, 0, 1, window.objeto.COM[2]],
+		      [0, 0, 0, 1]];
+    
+    var translatedRotMatrix = [[1, 0, 0, 0],
+	 		       [0, 1, 0, 0],
+			       [0, 0, 1, 0],
 			       [0, 0, 0, 1]];
     while (rotationStack.length > 0) {
 	var matRot;
@@ -198,6 +208,7 @@ function execRotate() {
 		      [-sine, cosine, 0, 0],
 		      [0, 0, 1, 0],
 		      [0, 0, 0, 1]];
+	    translatedRotMatrix = matrizvMatriz4d(matRot, translatedRotMatrix);
 	    break;
 	case 'YAH':
 	case 'YH':
@@ -205,6 +216,9 @@ function execRotate() {
 		      [0, 1, 0, 0],
 		      [sine, 0, cosine, 0],
 		      [0, 0, 0, 1]];
+	    translatedRotMatrix = matrizvMatriz4d(toOrigin, translatedRotMatrix);
+	    translatedRotMatrix = matrizvMatriz4d(matRot, translatedRotMatrix);
+	    translatedRotMatrix = matrizvMatriz4d(fromOrigin, translatedRotMatrix);
 	    break;
 	case 'XAH':
 	case 'XH':
@@ -212,16 +226,13 @@ function execRotate() {
 		      [0, cosine, -sine, 0],
 		      [0, sine, cosine, 0],
 		      [0, 0, 0, 1]];
+	    translatedRotMatrix = matrizvMatriz4d(toOrigin, translatedRotMatrix);
+	    translatedRotMatrix = matrizvMatriz4d(matRot, translatedRotMatrix);
+	    translatedRotMatrix = matrizvMatriz4d(fromOrigin, translatedRotMatrix);
 	    break;
 	}
 	rotMatrix = matrizvMatriz4d(matRot, rotMatrix);
-	translatedRotMatrix = matrizvMatriz4d(matRot, translatedRotMatrix);
     }
-    
-    translatedRotMatrix = matrizvMatriz4d([[1, 0, 0, window.objeto.COM[0]],
-					   [0, 1, 0, window.objeto.COM[1]],
-					   [0, 0, 1, window.objeto.COM[2]],
-					   [0, 0, 0, 1]], translatedRotMatrix);
     for (var i = 0; i < (window.objeto.V.length); i++) {
 	var N = window.objeto.V[i].N;
 	window.objeto.V[i] = vetorMatriz4d(window.objeto.V[i], translatedRotMatrix);
