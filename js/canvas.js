@@ -19,6 +19,7 @@ function disabledButtons(b) {
 }
 
 function setup() {
+    window.onkeydown = arrowKANYE;    
     window.cameraFileChooser = document.getElementById('cameraFile');
     window.lightFileChooser = document.getElementById('lightFile');
     window.objectFileChooser = document.getElementById('objectFile');
@@ -83,7 +84,7 @@ function setup() {
 };
 
 function rot(evt) {
-    var deg = degrees.value;
+    var deg = parseInt(degrees.value);
     
     if (isNaN(deg)) deg = 180;
 
@@ -177,8 +178,167 @@ function execRotate() {
     }
     // rotaciona COM agora
     window.objeto.COM = vetorMatriz4d(window.objeto.COM, translatedRotMatrix);
+
+    // reordenando as faces pois os Zs provavelmente mudaram bastante
+    window.objeto.F = window.objeto.F.sort(function(f1, f2) {
+	var f1_mediaZ = (window.objeto.V[f1.a].z +
+			 window.objeto.V[f1.b].z +
+			 window.objeto.V[f1.c].z)/3;
+	var f2_mediaZ = (window.objeto.V[f2.a].z +
+			 window.objeto.V[f2.b].z +
+			 window.objeto.V[f2.c].z)/3;
+	return f1 - f2;
+    });
+
     setTimeout(hmmm, 0);
 }
+
+function arrowKANYE(e) {
+    e = e || window.event;
+    debugger;
+    if (['38', '40', '37', '39', '90', '88'].indexOf(''+e.keyCode) != -1) {
+	translada(e.keyCode);
+    } else return;
+}
+
+function translada(dir) {
+    if (!window.objeto) return;
+    playit();
+    var moveAmount = parseInt(degrees.value);
+    
+    if (isNaN(moveAmount)) moveAmount = 10;
+
+    // converter de pixel pra camera
+
+    var xtr = 0, ytr = 0, ztr = 0;
+    if (dir == '38') {
+	// ^
+	var minY = window.window.ponto2d[0].y;
+	var maxY = minY;
+	var vminY = 0;
+	var vmaxY = 0;
+	for (var i = 1; i < window.ponto2d.length; i++) {
+	    var curY = window.ponto2d[i].y;
+	    if (curY < minY) {
+		minY = curY;
+		vminY = window.ponto2d[i].originalVertex;
+	    }
+	    if (curY > maxY) {
+		maxY = curY;
+		vmaxY = window.ponto2d[i].originalVertex;
+	    }
+	}
+	var dyPixel = Math.abs(minY - maxY);
+	var distanceRatio = Math.abs(window.objeto.V[vminY].y -
+				     window.objeto.V[vmaxY].y);
+	distanceRatio = distanceRatio/dyPixel;
+	moveAmount *= distanceRatio;
+	ytr = moveAmount;
+    } else if (dir  == '40') {
+	// v
+	var minY = window.ponto2d[0].y;
+	var maxY = minY;
+	var vminY = 0;
+	var vmaxY = 0;
+	for (var i = 1; i < window.ponto2d.length; i++) {
+	    var curY = window.ponto2d[i].y;
+	    if (curY < minY) {
+		minY = curY;
+		vminY = window.ponto2d[i].originalVertex;
+	    }
+	    if (curY > maxY) {
+		maxY = curY;
+		vmaxY = window.ponto2d[i].originalVertex;
+	    }
+	}
+	var dyPixel = Math.abs(minY - maxY);
+	var distanceRatio = Math.abs(window.objeto.V[vminY].y -
+				     window.objeto.V[vmaxY].y);
+	distanceRatio = distanceRatio/dyPixel;
+	moveAmount *= distanceRatio;
+	ytr = -moveAmount;
+    } else if (dir == '39') {
+	// ->
+	var minX = window.ponto2d[0].x;
+	var maxX = minX;
+	var vminX = 0;
+	var vmaxX = 0;
+	for (var i = 1; i < window.ponto2d.length; i++) {
+	    var curX = window.ponto2d[i].x;
+	    if (curX < minX) {
+		minX = curX;
+		vminX = window.ponto2d[i].originalVertex;
+	    }
+	    if (curX > maxX) {
+		maxX = curX;
+		vmaxX = window.ponto2d[i].originalVertex;
+	    }
+	}
+	var dyPixel = Math.abs(minX - maxX);
+	var distanceRatio = Math.abs(window.objeto.V[vminX].x -
+				     window.objeto.V[vmaxX].x);
+	distanceRatio = distanceRatio/dyPixel;
+	moveAmount *= distanceRatio;
+	xtr = moveAmount;
+    } else if (dir == '37') {
+	// <-
+	var minX = window.ponto2d[0].x;
+	var maxX = minX;
+	var vminX = 0;
+	var vmaxX = 0;
+	for (var i = 1; i < window.ponto2d.length; i++) {
+	    var curX = window.ponto2d[i].x;
+	    if (curX < minX) {
+		minX = curX;
+		vminX = window.ponto2d[i].originalVertex;
+	    }
+	    if (curX > maxX) {
+		maxX = curX;
+		vmaxX = window.ponto2d[i].originalVertex;
+	    }
+	}
+	var dyPixel = Math.abs(minX - maxX);
+	var distanceRatio = Math.abs(window.objeto.V[vminX].x -
+				     window.objeto.V[vmaxX].x);
+	distanceRatio = distanceRatio/dyPixel;
+	moveAmount *= distanceRatio;
+	xtr = -moveAmount;
+    } else if (dir == '90') {
+	// z, z entrando
+	ztr = moveAmount;
+    } else if (dir == '88') {
+	// x, z saindo
+	ztr = -moveAmount;
+    } else return;
+
+    var translateMatrix = [[1, 0, 0, xtr],
+	 		   [0, 1, 0, ytr],
+			   [0, 0, 1, ztr],
+			   [0, 0, 0, 1]];
+
+    
+    for (var i = 0; i < (window.objeto.V.length); i++) {
+	var N = window.objeto.V[i].N;
+	window.objeto.V[i] = vetorMatriz4d(window.objeto.V[i], translateMatrix);
+	window.objeto.V[i].N = N;
+    }
+    // translada COM agora
+    window.objeto.COM = vetorMatriz4d(window.objeto.COM, translateMatrix);
+
+    // reordenando as faces por precaucao, mas logicamente nenhum Z
+    // mudou relativo a outro
+    window.objeto.F = window.objeto.F.sort(function(f1, f2) {
+	var f1_mediaZ = (window.objeto.V[f1.a].z +
+			 window.objeto.V[f1.b].z +
+			 window.objeto.V[f1.c].z)/3;
+	var f2_mediaZ = (window.objeto.V[f2.a].z +
+			 window.objeto.V[f2.b].z +
+			 window.objeto.V[f2.c].z)/3;
+	return f1 - f2;
+    });
+    setTimeout(hmmm, 0);
+}
+
 
 function leArquivos() {
     var leitor;
@@ -274,6 +434,19 @@ function initialStep() {
 	ehUtilizado[b] = true;
 	ehUtilizado[c] = true;
     }
+
+    // ordenando as faces pelo menor Z para melhorar o desempenho do zbuffer
+    window.objeto.F = window.objeto.F.sort(function(f1, f2) {
+	var f1_mediaZ = (window.objeto.V[f1.a].z +
+			 window.objeto.V[f1.b].z +
+			 window.objeto.V[f1.c].z)/3;
+	var f2_mediaZ = (window.objeto.V[f2.a].z +
+			 window.objeto.V[f2.b].z +
+			 window.objeto.V[f2.c].z)/3;
+	return f1 - f2;
+    });
+    
+    
     var qtdUtilizados = 0;
     for (i = 0; i < (window.objeto.V.length); i++) {
 	// normalizando as normais dos vértices
@@ -648,13 +821,7 @@ function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 	// ou um ponto
 	var arrX = [v1, v2, v3];
 	arrX = arrX.sort(function(a, b) {
-	    if (a.x < b.x) {
-		return -1;
-	    }
-	    if (a.x > b.x) {
-		return 1;
-	    }
-	    return 0;
+	    return a.x - b.x;
 	});
 	var x0 = arrX[0];
 	var xm = arrX[1];
@@ -735,13 +902,7 @@ function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 	// ou um ponto
 	var arrX = [v1, v2, v3];
 	arrX = arrX.sort(function(a, b) {
-	    if (a.x < b.x) {
-		return -1;
-	    }
-	    if (a.x > b.x) {
-		return 1;
-	    }
-	    return 0;
+	    return a.x - b.x;
 	});
 	var x0 = arrX[0];
 	var xm = arrX[1];
