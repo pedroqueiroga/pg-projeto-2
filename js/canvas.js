@@ -612,8 +612,12 @@ function phong(N, P, xf, y) {
     }
     var cosLN = L.produtoInterno(N);
     var cosRV = R.produtoInterno(V);
-    if (R.produtoInterno(V) < 0) {
+    if (cosRV < 0) {
 	ks = 0;
+    }
+    if (cosLN < 0) {
+	ks = 0;
+	kd = 0;
     }
 
     var OdIl = Od.produtoComponentes(Il);
