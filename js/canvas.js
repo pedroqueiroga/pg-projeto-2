@@ -187,7 +187,7 @@ function execRotate() {
 	var f2_mediaZ = (window.objeto.V[f2.a].z +
 			 window.objeto.V[f2.b].z +
 			 window.objeto.V[f2.c].z)/3;
-	return f1 - f2;
+	return f1_mediaZ - f2_mediaZ;
     });
 
     setTimeout(hmmm, 0);
@@ -334,7 +334,7 @@ function translada(dir) {
 	var f2_mediaZ = (window.objeto.V[f2.a].z +
 			 window.objeto.V[f2.b].z +
 			 window.objeto.V[f2.c].z)/3;
-	return f1 - f2;
+	return f1_mediaZ - f2_mediaZ;
     });
     setTimeout(hmmm, 0);
 }
@@ -443,7 +443,7 @@ function initialStep() {
 	var f2_mediaZ = (window.objeto.V[f2.a].z +
 			 window.objeto.V[f2.b].z +
 			 window.objeto.V[f2.c].z)/3;
-	return f1 - f2;
+	return f1_mediaZ - f2_mediaZ;
     });
     
     
