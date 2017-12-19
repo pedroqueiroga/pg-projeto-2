@@ -1,22 +1,52 @@
 body{
     display: flex;
     background: pink;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    height: 100vh;
+    margin: 0;
 }
 #options{
-    border: dashed purple;
-    width: 25vw;
+    background: pink;
+    width: 15vw;
     padding: 0;
     margin: auto;
-    font-size: 20px;
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: top;
+    height: 100vh;
 }
-.options{
-    width: 25vw;
+
+#options label{
+    font-size: 12px;
+    display: block;
+    color: purple;
+}
+
+#options input{
+    width: 9vw;
+
+}
+
+#options h5{
+    font-size: 16px;
+    color: purple;
+}
+
+#rotateStack{
+    overflow-y: scroll;
+    max-height: 10vh;
+}
+
+#rotations{
     display: flex;
-    flex-direction: column;
+    width: 13vw;
+    margin: 1vw;
+    flex-wrap: wrap;
+    justify-content: space-around;
 }
 
 pre {
@@ -36,7 +66,7 @@ canvas {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 120px;
+    width: 5vw;
     background-color: black;
     color: #fff;
     text-align: center;
