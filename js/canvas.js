@@ -622,15 +622,15 @@ function phong(N, P, xf, y) {
 
     var OdIl = Od.produtoComponentes(Il);
     var Iamb = Ia.produtoEscalar(ka);
-    var Is = OdIl.produtoEscalar(kd * cosLN);
-    var Id = Il.produtoEscalar(ks * Math.pow(cosRV, n));
+    var Id = OdIl.produtoEscalar(kd * cosLN);
+    var Is = Il.produtoEscalar(ks * Math.pow(cosRV, n));
 
     var I = Iamb.mais(Id).mais(Is);
     I.x = Math.min(I.x, 255);
     I.y = Math.min(I.y, 255);
     I.z = Math.min(I.z, 255);
     stroke(Math.round(I.x), Math.round(I.y), Math.round(I.z));
-    //	p.stroke(Math.floor(Math.abs(N.x) * 255), Math.floor(Math.abs(N.y) * 255), Math.floor(Math.abs(N.z) * 255));
+    //stroke(Math.floor(Math.abs(N.x) * 255), Math.floor(Math.abs(N.y) * 255), Math.floor(Math.abs(N.z) * 255));
     point(xf, y);
 }
 
