@@ -110,10 +110,10 @@
 
   vec3 OdIl = u_Od * u_Il;
   vec3 Iamb = u_Ia * ka;
-  vec3 Is = OdIl * (kd * cosLN);
+  vec3 Id = OdIl * (kd * cosLN);
   // como, caso cosRV seja negativo, ks = 0, podemos fazer abs
   // se nao desse estariamos fodidos pois pow eh indefinido pra negativo
-  vec3 Id = u_Il * (ks * pow(abs(cosRV), n));
+  vec3 Is = u_Il * (ks * pow(abs(cosRV), n));
   vec3 I = Iamb + Is + Id;
   // nao precisa de capar rgb, pois >1 eh 1
   gl_FragColor = vec4(I.r/255.0, I.g/255.0, I.b/255.0, 1.0);		 
