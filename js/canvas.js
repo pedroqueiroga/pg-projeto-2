@@ -408,8 +408,8 @@ function initialStep() {
 				       P_objeto_vista.z);
     }
 
-    var ehUtilizado = createArray(window.objeto.V.length);
-    ehUtilizado = ehUtilizado.fill(false);
+    var CASum = {x: 0, y: 0, z: 0};
+    var areasSum = 0;
 
     for (i = 0; i < (window.objeto.F.length); i++) {
 	// criando triângulos e suas normais
@@ -430,10 +430,31 @@ function initialStep() {
 	window.objeto.V[c].N = (window.objeto.V[c].N)
 	    .mais(window.objeto.F[i].N);
 
-	ehUtilizado[a] = true;
-	ehUtilizado[b] = true;
-	ehUtilizado[c] = true;
+
+	var ab = window.objeto.V[b].menos(window.objeto.V[a]);
+	var ac = window.objeto.V[c].menos(window.objeto.V[a]);
+
+	var cx = (window.objeto.V[a].x +
+		  window.objeto.V[b].x +
+		  window.objeto.V[c].x) / 3;
+	var cy = (window.objeto.V[a].y +
+		  window.objeto.V[b].y +
+		  window.objeto.V[c].y) / 3;
+	var cz = (window.objeto.V[a].z +
+		  window.objeto.V[b].z +
+		  window.objeto.V[c].z) / 3;
+
+	var area = ab.produtoVetorial(ac).norma * 0.5;
+	areasSum += area;
+	CASum.x += cx * area;
+	CASum.y += cy * area;
+	CASum.z += cz * area;
+	
     }
+
+    window.objeto.COM.x = CASum.x/areasSum;
+    window.objeto.COM.y = CASum.y/areasSum;
+    window.objeto.COM.z = CASum.z/areasSum;
 
     // ordenando as faces pelo menor Z para melhorar o desempenho do zbuffer
     window.objeto.F = window.objeto.F.sort(function(f1, f2) {
@@ -452,18 +473,7 @@ function initialStep() {
 	// normalizando as normais dos vértices
 	window.objeto.V[i].N = (window.objeto.V[i].N).normalizado();
 
-	// calculando centroide para translação das rotações
-	if (ehUtilizado[i]) {
-	    qtdUtilizados++;
-	    window.objeto.COM.x += window.objeto.V[i].x;
-	    window.objeto.COM.y += window.objeto.V[i].y;
-	    window.objeto.COM.z += window.objeto.V[i].z;
-	}
     }
-    window.objeto.COM.x = window.objeto.COM.x/qtdUtilizados;
-    window.objeto.COM.y = window.objeto.COM.y/qtdUtilizados;
-    window.objeto.COM.z = window.objeto.COM.z/qtdUtilizados;
-
     console.log('ok');
     setTimeout(hmmm, 0);
 }
