@@ -24,6 +24,11 @@
       </div>
       <button type="button" id="initialSteps" disabled="true">Carregar Parametros</button>
       
+      <div class="tooltip">
+        <label>Ângulo:</label>
+        <input id="degrees" value=90></input>
+        <span class="tooltiptext">Ângulo em graus</span>
+      </div>
 
       <div id="rotations">
         <button type="button" id="ZH" disabled="true">Z, horário</button>
@@ -34,15 +39,10 @@
         <button type="button" id="YAH" disabled="true"> Y, antihorário</button>
       </div>
 
-      <div class="tooltip">
-        <label>Ângulo:</label>
-        <input id="degrees"></input>
-        <span class="tooltiptext">Ângulo em graus</span>
-      </div>
+      <label>Rotações:</label>
+      <div id="rotateStack"></div>
 
       <button type="button" id="rotate" disabled="true">EXECUTAR ROTAÇÕES</button>
-
-      <div id="rotateStack"></div>
 
     </div>
 

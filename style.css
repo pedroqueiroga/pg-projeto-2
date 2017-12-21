@@ -10,24 +10,27 @@ body{
 }
 #options{
     background: pink;
-    width: 15vw;
+    width: 25vw;
     padding: 0;
     margin: auto;
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: top;
-    height: 100vh;
+    justify-content: space-between;
+    align-items: center;
+    height: 70vh;
+    padding-bottom: 1vh;
+    border: purple solid 5px;
 }
 
 #options label{
-    font-size: 12px;
-    display: block;
+    font-size: 14px;
     color: purple;
+    display: flex;
 }
 
-#options input{
-    width: 9vw;
+#cameraFile #lightFile #objectFile{
+    width: 20vw;
 
 }
 
@@ -38,12 +41,15 @@ body{
 
 #rotateStack{
     overflow-y: scroll;
-    max-height: 10vh;
+    max-height: 10%;
+    min-height: 10%;
+    width: 20vw;
+    text-align: justify;
 }
 
 #rotations{
     display: flex;
-    width: 13vw;
+    width: 15vw;
     margin: 1vw;
     flex-wrap: wrap;
     justify-content: space-around;
