@@ -943,31 +943,16 @@ function phong(N, P, xf, y) {
 //     }
 // }
 
-function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
+function zBuf(xf, scanlineY, v1, v2, v3) {
     var bar = baricentro(new Ponto2d(xf, scanlineY),
 			 v1,
 			 v2,
 			 v3);
     var P, N;
     var objVa, objVb, objVc;
-    if (a === null) {
-	objVa = P4;
-	objVa.N = N4;
-    } else {
-	objVa = window.objeto.V[a];
-    }
-    if (b === null) {
-	objVb = P4;
-	objVb.N = N4;
-    } else {
-	objVb = window.objeto.V[b];
-    }
-    if (c === null) {
-	objVc = P4;
-	objVc.N = N4;
-    } else {
-	objVc = window.objeto.V[c];
-    }
+    objVa = window.objeto.V[v1.originalVertex];
+    objVb = window.objeto.V[v2.originalVertex];
+    objVc = window.objeto.V[v3.originalVertex];
     
     if (isNaN(bar.u) || isNaN(bar.v) || isNaN(bar.w)) {
 	// diagonal
@@ -1075,7 +1060,10 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
 
 }
 
-function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
+// fillBottom e fillTop sempre recebem o conjunto original de vertices,
+// vert.
+// v1 v2 e v3 podem conter um artificial!
+function fillBottomFlatTriangle(v1, v2, v3, vert1, vert2, vert3) {
     // calcula quantos pixels X precisa andar quando descermos um Y,
     // para acompanhar os lados dos triângulos.
 
@@ -1137,7 +1125,7 @@ function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 		var xf = Math.round(x);
 		if (xf < cv.width && scanlineY < cv.height &&
 		    xf >= 0 && scanlineY >= 0) {
-		    zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P, N);
+		    zBuf(xf, scanlineY, vert1, vert2, vert3);
 		}
 	    }
 	    curx1 += invslope1;
@@ -1204,7 +1192,7 @@ function baricentro(p, a, b, c) {
     return {u, v, w};
 }
 
-function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
+function fillTopFlatTriangle(v1, v2, v3, vert1, vert2, vert3) {
     // aqui encontramos quanto x de cada lado deve mudar
     // quando y SUBIR (no caso diminuir pois o y é invertido)
 
@@ -1222,6 +1210,7 @@ function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 
     var curx1 = v3.x;
     var curx2 = v3.x;
+
     if (v1.y == v3.y) {
 	// caso de uma linha horizontal
 	// ou um ponto
@@ -1264,7 +1253,7 @@ function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 		var xf = Math.round(x);
 		if (xf < cv.width && scanlineY < cv.height &&
 		    xf >= 0 && scanlineY >= 0) {
-		    zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P, N);
+		    zBuf(xf, scanlineY, vert1, vert2, vert3);
 		}
 	    }
 	    curx1 -= invslope1;
@@ -1288,46 +1277,18 @@ function drawTriangle(triangle) {
     /* here we know that v1.y <= v2.y <= v3.y */
     /* check for trivial case of bottom-flat triangle */
     if (v2.y == v3.y) {
-	fillBottomFlatTriangle(v1, v2, v3, v1.originalVertex, v2.originalVertex, v3.originalVertex);
+	fillBottomFlatTriangle(v1, v2, v3, v1, v2, v3);
     }
     /* check for trivial case of top-flat triangle */
     else if (v1.y == v2.y) {
-	fillTopFlatTriangle(v1, v2, v3, v1.originalVertex, v2.originalVertex, v3.originalVertex);
+	fillTopFlatTriangle(v1, v2, v3, v1, v2, v3);
     }
     else {
-
 	//general case - split the triangle in a topflat and bottom-flat one
 	var v4 = new Ponto2d(
 	    Math.round((v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x))), v2.y);
-	// após quebrar o triângulo em dois, nós terminamos com um vértice
-	// artificial. Como faremos as interpolações? Para isso criamos um
-	// vértice 3D artificial também, aproximado, e usamos ele para as
-	// interpolações.
-
-	// em retrospectiva provavelmente teria sido melhor usar um dos três
-	// vértices originais mesmo e usar o v4 apenas para o scanline, usando
-	// os originais para as interpolações ainda (menos aproximações).
-	var lp = baricentro(v4, v1, v2, v3);
-	var P = new Ponto(window.objeto.V[v1.originalVertex].x * lp.u +
-			  window.objeto.V[v2.originalVertex].x * lp.v +
-			  window.objeto.V[v3.originalVertex].x * lp.w,
-			  window.objeto.V[v1.originalVertex].y * lp.u +
-			  window.objeto.V[v2.originalVertex].y * lp.v +
-			  window.objeto.V[v3.originalVertex].y * lp.w,
-			  window.objeto.V[v1.originalVertex].z * lp.u +
-			  window.objeto.V[v2.originalVertex].z * lp.v +
-			  window.objeto.V[v3.originalVertex].z * lp.w);
-	var N = new Vetor(window.objeto.V[v1.originalVertex].N.x * lp.u +
-			  window.objeto.V[v2.originalVertex].N.x * lp.v +
-			  window.objeto.V[v3.originalVertex].N.x * lp.w,
-			  window.objeto.V[v1.originalVertex].N.y * lp.u +
-			  window.objeto.V[v2.originalVertex].N.y * lp.v +
-			  window.objeto.V[v3.originalVertex].N.y * lp.w,
-			  window.objeto.V[v1.originalVertex].N.z * lp.u +
-			  window.objeto.V[v2.originalVertex].N.z * lp.v +
-			  window.objeto.V[v3.originalVertex].N.z * lp.w);
-	fillBottomFlatTriangle(v1, v2, v4, v1.originalVertex, v2.originalVertex, null, P, N);
-	fillTopFlatTriangle(v2, v4, v3, v2.originalVertex, null, v3.originalVertex, P, N);
+	fillBottomFlatTriangle(v1, v2, v4, v1, v2, v3);
+	fillTopFlatTriangle(v2, v4, v3, v1, v2, v3);
     }
 }
 
