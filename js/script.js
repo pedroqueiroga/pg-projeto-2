@@ -233,7 +233,7 @@ function execRotate() {
     for (var i = 0; i < (window.objeto.V.length); i++) {
 	var N = window.objeto.V[i].N;
 	window.objeto.V[i] = vetorMatriz4d(window.objeto.V[i], translatedRotMatrix);
-	window.objeto.V[i].N = vvetorMatriz4d(N, rotMatrix);
+	window.objeto.V[i].N = vvetorMatriz4d(N, rotMatrix).normalizado();
     }
     // rotaciona COM agora
     window.objeto.COM = vetorMatriz4d(window.objeto.COM, translatedRotMatrix);
