@@ -1,4 +1,6 @@
+// decide a cor do background, grayscale, pode mudar
 bgColor = 128;
+// próximas linhas pegam os elemento de interação com a página
 window.cameraFileChooser = document.getElementById('cameraFile');
 window.lightFileChooser = document.getElementById('lightFile');
 window.objectFileChooser = document.getElementById('objectFile');
@@ -13,13 +15,17 @@ window.degrees = document.getElementById('degrees');
 window.rotate = document.getElementById('rotate');
 window.rotateText = document.getElementById('rotateStack');
 
+// carrega a musica de espera hehehe
 window.waitingSong = new Audio('../assets/wii.mp3');
 
+// desativa os botões, no firefox é necessário.
 disabledButtons(true);
 disableRotateButtons(true);
 
+// pilha de rotações para construir as rotações compostas
 window.rotationStack = [];
 
+// desabilita botões relacionados à rotação
 function disableRotateButtons(b) {
     zPlus.disabled = b;
     zMinus.disabled = b;
@@ -31,6 +37,7 @@ function disableRotateButtons(b) {
     rotate.disabled = b;
 }
 
+// desabilita botões de setup
 function disabledButtons(b) {
     window.cameraFileChooser.disabled = b;
     window.lightFileChooser.disabled = b;
@@ -39,22 +46,29 @@ function disabledButtons(b) {
 }
 
 window.waitingSong.oncanplay = function() {
+    // diz que a música deve recomeçar ao terminar
     window.waitingSong.loop = true;
+    // dá vida às possibilidades de translações
     window.onkeydown = arrowKANYE;
-    debugger;
 
+    // pega o canvas e diz que usarei webgl
     window.cv = document.getElementById("canvas");
-    // window.cv.width = window.cv.clientWidth;
-    // window.cv.height = window.cv.clientHeight;
     window.gl = cv.getContext("webgl");
     if (!window.gl) {
 	alert("webgl não suportado");
     }
 
+    // cria programa a partir dos shaders que estão no HTML
+    // 2d-fragment-shader é usado para calcular phong num array de pontos
+    // 2d-vertex-shader é usado pra transformar de pixel pra clipspace que
+    // é o que o webgl usa
     window.program =
 	webglUtils.createProgramFromScripts(gl,
 					    ["2d-vertex-shader",
 					     "2d-fragment-shader"]);
+
+    // pega o endereço de memória das variáveis do shader, para poder passar
+    // buffers pra gpu
     window.positionAttributeLocation = gl.getAttribLocation(program,
 							    "a_position");
 
@@ -83,11 +97,15 @@ window.waitingSong.oncanplay = function() {
 						     "u_kd");
     window.RugosidadeUniformLocation = gl.getUniformLocation(program,
 							     "u_n");
-    
+
+    // cria buffers que serão passados pra gpu
+    // positionBuffer é de pixel, para o vertex fazer pixel->clipspace
+    // a i-ésima posição de normalBuffer é a normal do i-ésimo ponto de
+    // pointBuffer, que são os pontos 3D originais (para cálculo de phong)
     window.positionBuffer = gl.createBuffer();
     window.normalBuffer = gl.createBuffer();
     window.pointBuffer = gl.createBuffer();
-    
+
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     gl.useProgram(program);
@@ -96,6 +114,7 @@ window.waitingSong.oncanplay = function() {
     gl.enableVertexAttribArray(normalAttributeLocation);
     gl.enableVertexAttribArray(pointAttributeLocation);
 
+    // dá pro vertex-shader a resolução, para o cálculo do clipspace
     gl.uniform2f(resolutionUniformLocation,
 		 gl.drawingBufferWidth,
 		 gl.drawingBufferHeight);
@@ -119,6 +138,7 @@ window.waitingSong.oncanplay = function() {
     else { 
 	alert("Este navegador não suporta Files");
     }
+    // adiciona eventos da translação
     window.zPlus.addEventListener('click',
 				  rot,
 				  false);
@@ -142,20 +162,26 @@ window.waitingSong.oncanplay = function() {
 				   false);
 };
 
+// rot é chamado quando um botão é clicado para colocar mais uma rotação
+// na pilha de rotações
 function rot(evt) {
+    // pega o valor que tem no input degrees
     var deg = parseInt(degrees.value);
     
     if (isNaN(deg)) deg = 180;
 
+    // transforma de grau pra radiano
     deg = deg * Math.PI/180;
     
     var id = evt.target.id;
     var cosine, sine;
     cosine = Math.cos(deg);
     sine = Math.sin(deg);
+    // se for antihorário, inverte o seno
     if (id.indexOf("AH") !== -1) {
 	sine = -sine;
     }
+    // empilha rotação pedida e constrói string que aparece na interface
     rotationStack.push([id, sine, cosine]);
     if (rotateText.innerHTML.length == 0) {
 	rotateText.innerHTML = "(" + id + ", " + Math.round((deg + 0.00001) * 100) / 100 + "rad)";
@@ -165,7 +191,9 @@ function rot(evt) {
 }
 
 function execRotate() {
+    // não fazer nada se não tiver nada pra fazer
     if (rotationStack.length == 0) return;
+    // começa a música de espera
     playit();
     disableRotateButtons(true);
     // como as normais são vetores, uma classe de equipolência,
@@ -173,11 +201,16 @@ function execRotate() {
 
     // o ideal seria computar o miolo e só aplicar a transalação em uma,
     // assim não repetiríamos as contas tantas vezes, mas a ordem faz
-    // diferença, então não sei bem como evitar isso.
+    // diferença, então não sei bem como evitar isso, sendo mais agravado
+    // porque Z precisa ser no eixo da câmera.
+
+    // matriz para rotacionar vetores, sem translação
     var rotMatrix = [[1, 0, 0, 0],
 	 	     [0, 1, 0, 0],
 		     [0, 0, 1, 0],
 		     [0, 0, 0, 1]];
+
+    // matrizes para rotacionar pontos, com translações
     var toOrigin = [[1, 0, 0, -window.objeto.COM.x],
 	 	    [0, 1, 0, -window.objeto.COM.y],
 		    [0, 0, 1, -window.objeto.COM.z],
@@ -187,7 +220,8 @@ function execRotate() {
 	 	      [0, 1, 0, window.objeto.COM.y],
 		      [0, 0, 1, window.objeto.COM.z],
 		      [0, 0, 0, 1]];
-    
+
+    // matriz inicial, será composta com várias outras
     var translatedRotMatrix = [[1, 0, 0, 0],
 	 		       [0, 1, 0, 0],
 			       [0, 0, 1, 0],
@@ -198,6 +232,12 @@ function execRotate() {
 	var cosine, sine;
 	sine = rotation[1]; cosine = rotation[2];
 
+	// as matrizes a seguir são matrizes de translação em 3D, que serão
+	// compostas com as de rotação (se não for no eixo Z) e com as
+	// anteriores.
+	// O sinal do seno foi encontrado experimentalmente para tentar
+	// fazer com que ficasse mesmo horário ou antihorário, mas
+	// em alguns objetos isso é invertido. Uma questão em aberto no projeto.
 	switch (rotation[0]) {
 	case 'ZAH':
 	case 'ZH':
@@ -205,6 +245,7 @@ function execRotate() {
 		      [-sine, cosine, 0, 0],
 		      [0, 0, 1, 0],
 		      [0, 0, 0, 1]];
+	    // aqui só faz a rotação pois é no eixo Z da câmera mesmo
 	    translatedRotMatrix = matrizvMatriz4d(matRot, translatedRotMatrix);
 	    break;
 	case 'YAH':
@@ -228,14 +269,22 @@ function execRotate() {
 	    translatedRotMatrix = matrizvMatriz4d(fromOrigin, translatedRotMatrix);
 	    break;
 	}
+	// sempre apenas rotação, pois é para os vetores
 	rotMatrix = matrizvMatriz4d(matRot, rotMatrix);
     }
     for (var i = 0; i < (window.objeto.V.length); i++) {
+	// pega a normal do objeto antes da transformação, para poder
+	// transformá-la!
 	var N = window.objeto.V[i].N;
+	// transforma os pontos, transladando para a origem e rotacionando-os
+	// em torno do seu centroide
 	window.objeto.V[i] = vetorMatriz4d(window.objeto.V[i], translatedRotMatrix);
+	// rotaciona os vetores, que não devem sofrer translação
 	window.objeto.V[i].N = vvetorMatriz4d(N, rotMatrix).normalizado();
     }
-    // rotaciona COM agora
+    // rotaciona COM, para rotações no eixo X e Y isso não terá nenhum efeito,
+    // mas para rotações no eixo da camera isso faz toda a diferença,
+    // naturalmente.
     window.objeto.COM = vetorMatriz4d(window.objeto.COM, translatedRotMatrix);
 
     // reordenando as faces pois os Zs provavelmente mudaram bastante
@@ -253,7 +302,6 @@ function execRotate() {
 
 function arrowKANYE(e) {
     e = e || window.event;
-    debugger;
     if (['38', '40', '37', '39', '90', '88'].indexOf(''+e.keyCode) != -1) {
 	translate(e.keyCode);
     } else return;
@@ -266,8 +314,17 @@ function translate(dir) {
     
     if (isNaN(moveAmount)) moveAmount = 10;
 
-    // converter de pixel pra camera
+    // converter de pixel pra camera.
+    // é apenas uma grande gambiarra para tentar dizer a quantidade de pixels
+    // que queremos que a imagem se mova, parecia que seria mais simples no
+    // começo mas aí foi se mostrando complicadinho, como isso é um bônus
+    // ficou por isso mesmo.
 
+    // o que está sendo feito aqui é calcular a maior distância entre os pixels
+    // Y ou X, calcular a distância entre esses pontos no 3D e fazendo uma
+    // regra de três para chegar em quanto precisamos transladar o 3D pra mexer
+    // a quantidade requisitada de pixels. Não é invertível por causa da
+    // perspectiva, e não funciona direito de qualquer forma.
     var xtr = 0, ytr = 0, ztr = 0;
     if (dir == '38') {
 	// ^
@@ -378,6 +435,7 @@ function translate(dir) {
     for (var i = 0; i < (window.objeto.V.length); i++) {
 	var N = window.objeto.V[i].N;
 	window.objeto.V[i] = vetorMatriz4d(window.objeto.V[i], translateMatrix);
+	// aqui a gente apenas recupera a normal.
 	window.objeto.V[i].N = N;
     }
     // translada COM agora
@@ -397,6 +455,8 @@ function translate(dir) {
     setTimeout(hmmm, 0);
 }
 
+// função que le arquivos hehe. também inicializa matriz de câmera e
+// outras coisas que dão para serem feitas aqui
 function leArquivos() {
     var leitor;
     try {
@@ -417,6 +477,8 @@ function leArquivos() {
 	leitor = new Leitor(window.lightFileTxt);
 	window.iluminacao = null;
 	window.iluminacao = leitor.lerIluminacao();
+	// esse trecho a seguir calcula a cor do background, para que
+	// ele fique parecido com a cor que o objeto terá.
 	var OdIl = window.iluminacao.Od.produtoComponentes(window.iluminacao.Il);
 	var Iamb = window.iluminacao.Ia.produtoEscalar(window.iluminacao.ka);
 	var Is = OdIl.produtoEscalar(0.5 * window.iluminacao.kd);
@@ -440,6 +502,11 @@ function leArquivos() {
 
 }
 
+// dessa forma fica assíncrono e a música começa a tocar imediatamente
+// entre outros goodies. Esse padrão é visto em outras partes do código, em
+// geral para não travar o browser durante os cálculos -- isso meio que
+// faz parecer que coisas estão sendo executadas simultaneamente
+// (não tem thread em js)
 function initialSteps() {
     setTimeout(initialStep, 0);
 }
@@ -465,6 +532,7 @@ function initialStep() {
 				       P_objeto_vista.z);
     }
 
+    // inicializa variáveis para cálculo do centróide por decomposição geom.
     var CASum = {x: 0, y: 0, z: 0};
     var areasSum = 0;
 
@@ -487,9 +555,11 @@ function initialStep() {
 	window.objeto.V[c].N = (window.objeto.V[c].N)
 	    .mais(window.objeto.F[i].N);
 
+	// achando lados do triângulo, para cálculo da área.
 	var ab = window.objeto.V[b].menos(window.objeto.V[a]);
 	var ac = window.objeto.V[c].menos(window.objeto.V[a]);
 
+	// encontra baricentro desta face
 	var cx = (window.objeto.V[a].x +
 		  window.objeto.V[b].x +
 		  window.objeto.V[c].x) / 3;
@@ -500,19 +570,26 @@ function initialStep() {
 		  window.objeto.V[b].z +
 		  window.objeto.V[c].z) / 3;
 
+	// cálculo da área, para ponderar a influência que o baricentro
+	// desta face deverá ter sobre o centróide.
 	var area = ab.produtoVetorial(ac).norma * 0.5;
 	areasSum += area;
+	
 	CASum.x += cx * area;
 	CASum.y += cy * area;
 	CASum.z += cz * area;
 
     }
 
+    // encontra centroide
     window.objeto.COM.x = CASum.x/areasSum;
     window.objeto.COM.y = CASum.y/areasSum;
     window.objeto.COM.z = CASum.z/areasSum;
 
     // ordenando as faces pelo menor Z para melhorar o desempenho do zbuffer
+    // Um triângulo poderia ser bem comprido e só uma parte muito pequena dele
+    // ter o menor Z De todos, fazendo com que nesse caso essa heurística
+    // não ajude em nada. Calculando a média, isso pode ser aliviado
     window.objeto.F = window.objeto.F.sort(function(f1, f2) {
 	var f1_mediaZ = (window.objeto.V[f1.a].z +
 			 window.objeto.V[f1.b].z +
@@ -529,6 +606,10 @@ function initialStep() {
 
     }
 
+    // as próximas linhas alimentam o fragment-shader (cálculo de phong)
+    // com os valores fixos que phong precisa (não rotacionamos a luz,
+    // então é fixo). É do tipo uniform pois é o mesmo para todo e qualquer
+    // pixel que chegar no fragment-shader
     gl.uniform3f(PlUniformLocation,
 		 window.iluminacao.Pl.x,
 		 window.iluminacao.Pl.y,
@@ -589,6 +670,7 @@ function fileReadingRoutine(evt) {
     fileReader.readAsText(fileTobeRead);
 }
 
+// função auxiliar que serve para construir arrays de qualquer dimensão
 function createArray(length) {
     var arr = new Array(length || 0),
         i = length;
@@ -601,12 +683,12 @@ function createArray(length) {
     return arr;
 }
 
+// função para iniciar a música
 function playit() {
     window.waitingSong.play();
 }
 
-
-
+// faz o preamble pra renderizar
 function hmmm() {
     // projetar pontos pra coordenadas da tela
     window.ponto2d = createArray(window.objeto.V.length);
@@ -615,36 +697,48 @@ function hmmm() {
 					     cv.width, cv.height);
     }
 
+    // inicializar buffers
     window.zBuffer = createArray(cv.width, cv.height);
     window.nBuffer = createArray(cv.width, cv.height);
     window.pBuffer = createArray(cv.width, cv.height);
-    window.corBuffer = createArray(cv.width, cv.height);
     for (i = 0; i < window.zBuffer.length; i++) {
 	window.zBuffer[i] = window.zBuffer[i].fill(Infinity);
     }
     renderObj();
+    // arrays para os shaders
     var positions = [], normals = [], points = [];
-    var cores = [];
-    for (i = 0; i < window.corBuffer.length; i++) {
-	for (var j = 0; j < window.corBuffer[i].length; j++) {
+    // esse for a seguir é basicamente o que em python seria um reshape num
+    // numpy, pois os shaders esperam algo unidimensional. aproveitamos para
+    // só dar pra ele o que ele deve calcular phong em cima.
+    for (i = 0; i < window.zBuffer.length; i++) {
+	for (var j = 0; j < window.zBuffer[i].length; j++) {
 	    if (window.zBuffer[i][j] < Infinity) {
+		// se não for infinito, quer dizer que é pra pintar
+		// aquele pixel
+
+		// positions vai dizer as coordenadas de pixel do ponto
 		positions.push(i);
 		positions.push(j);
 
 		var normie = window.nBuffer[i][j];
 
+		// normals diz a normal do ponto
 		normals.push(normie.x);
 		normals.push(normie.y);
 		normals.push(normie.z);
 
 		var pt = window.pBuffer[i][j];
 
+		// points diz as coordenadas 3D do ponto
 		points.push(pt.x);
 		points.push(pt.y);
 		points.push(pt.z);
 	    }
 	}
     }
+    // coloca em positionBuffer, que lá em cima pegamos para ser o endereço de
+    // memória de um atributo do vertex-shader, as coordenadas 2d de cada pixel
+    // a ser pintado.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
     var size = 2;
@@ -669,9 +763,14 @@ function hmmm() {
 	pointAttributeLocation, size, type, normalize, stride, offset);
 
     
-
+    // pinta background com bgColor normalizado pra 0 a 1 pois é como o
+    // webGL funciona, RGB vai de 0 a 1. o quarto parâmetro é a transparência
+    // (alfa). 1.0 quer dizer opaco.
     gl.clearColor(bgColor/255, bgColor/255, bgColor/255, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
+    // manda executar os shaders definido pela chamada useProgram
+    // positions.length / 2 vezes (ou seja, sobre todos os pixels que
+    // nosso algoritmo decidiu que devia ser visível)
     gl.drawArrays(gl.POINTS, 0, positions.length / 2);
     setTimeout(function() {
 	window.waitingSong.pause();
@@ -681,6 +780,11 @@ function hmmm() {
 	rotateText.innerHTML = "";
     }, 500);
 }
+
+// zBufHorizontal foi uma tentativa de pintar triângulos que se degeneraram
+// para LINHAS HORIZONTAIS. também tem zBufVertical e um troço pra diagonal
+// dentro de zBuf, mas experimentalmente isso não se mostrou uma boa ideia,
+// parece ser melhor ignorar triângulos degenerados, no geral.
 
 // function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
 //     var lp = lerp(xf, v1, v2);
@@ -742,6 +846,7 @@ function hmmm() {
 //     }
 // }
 
+// phong é agora implementado no fragment-shader e nunca é chamado.
 function phong(N, P, xf, y) {
 
     N = N.normalizado();
@@ -774,9 +879,6 @@ function phong(N, P, xf, y) {
     I.x = Math.min(I.x, 255);
     I.y = Math.min(I.y, 255);
     I.z = Math.min(I.z, 255);
-    window.corBuffer[xf][y] = [Math.round(I.x),
-			       Math.round(I.y),
-			       Math.round(I.z)];
     //	p.stroke(Math.floor(Math.abs(N.x) * 255), Math.floor(Math.abs(N.y) * 255), Math.floor(Math.abs(N.z) * 255));
     //point(xf, y);
 }
@@ -869,7 +971,7 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
     
     if (isNaN(bar.u) || isNaN(bar.v) || isNaN(bar.w)) {
 	// diagonal
-	return;
+	return; // não nos importamos mais com triângulos degenerados
 	var lp1 = lerp2d({x: xf, y: scanlineY},
 			 v1, v2);
 	var lp2 = lerp2d({x: xf, y: scanlineY},
@@ -929,6 +1031,8 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
 	
     } else {
 	// alfa*v1_3d + beta*v2_3d + gamma*v3_3d
+
+	// interpola para aproximar o ponto 3D a partir do 2D.
 	P = new Ponto(objVa.x * bar.u +
 		      objVb.x * bar.v +
 		      objVc.x * bar.w,
@@ -954,9 +1058,15 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
     if (xf >= 0 && scanlineY >= 0 &&
 	xf < cv.width && scanlineY < cv.height &&
 	P.z <= window.zBuffer[xf][scanlineY]) {
-	if (P.z <= -1000) {
-	    debugger;
-	}
+	// if (P.z <= -1000) {
+	//     debugger;
+	// }
+
+	// constroi progressivamente os buffers para os shaders, ao invés
+	// de calcular logo. Isso faz com que apenas a quantidade mínima de
+	// pixels seja pintado (nenhum é realmente pintado por cima de outro),
+	// a um custo maior de memória. O ideal seria isso daqui ser tudo
+	// na gpu.
 	window.zBuffer[xf][scanlineY] = P.z;
 	window.nBuffer[xf][scanlineY] = N;
 	window.pBuffer[xf][scanlineY] = P;
@@ -966,13 +1076,24 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
 }
 
 function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
-    //debugger;
+    // calcula quantos pixels X precisa andar quando descermos um Y,
+    // para acompanhar os lados dos triângulos.
+
+
+    //      v1
+    //
+    //         v2     v3
+    // como v2.y > v1.y, se v2.x estiver mais à direita de v1.x,
+    // o curx1 deverá ir aumentando. se v1.x > v2.x, invslope1
+    // será negativo e o curx1 deverá diminuir. portanto, é só somar
+    // curx1 com invslope para obter o novo x do novo y.
     var invslope1 = (v2.x - v1.x) / (v2.y - v1.y);
     var invslope2 = (v3.x - v1.x) / (v3.y - v1.y);
 
     var curx1 = v1.x;
     var curx2 = v1.x;
 
+    // como foi dito, não nos importamos mais com triângulos degenerados.
     if (v1.y == v2.y) {
 	// caso de uma linha horizontal
 	// ou um ponto
@@ -1009,6 +1130,7 @@ function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
 	return;
     } else {
 	for (var scanlineY = v1.y; scanlineY <= v2.y; scanlineY++) {
+	    // sempre da esquerda para a direita!
 	    var x = curx1 < curx2 ? curx1 : curx2;
 	    var span = Math.abs(curx1 - curx2);
 	    for (var i = 0; i <= span; i++, x++) {
@@ -1040,17 +1162,61 @@ function lerp2d(p, a, b) {
 
 // encontra as coordenadas baricentricas
 function baricentro(p, a, b, c) {
-    //debugger;
+    // calcula a inversa da matriz 2x2
+    // x = u*x0 + v*x1 + w*x2
+    // y = u*y0 + v*y1 + w*y2
+
+    // x = (1 - v - w)*x0 + v*x1 + w*x2
+    // y = (1 - v - w)*y0 + v*y1 + w*y2
+
+    // v*(x1 - x0) + w*(x2 - x0) + x0 - x = 0
+    // v*(y1 - y0) + w*(y2 - y0) + y0 - y = 0
+
+    // v*AB + w*AC + A - P = 0
+    // v*AB + w*AC = P - A
+
+    // sendo isso uma transformação linar onde a matriz é
+    // AB e AC como colunas. como AB e AC são L.I., já que a b c é
+    // em tese um triângulo, essa transformação é invertível
+
+    // T*(v w)^t = P-A
+    // ser invertível nos dá
+    // T^-1*T^-1*(v w)^t = T^-1*(P-A).
+    // (v w)^t = T^-1 * (P - A).
+
+    // o problema se reduz à encontrar a inversa de T,
+    // pois temos P e A e queremos v e w.
+    //         AB                  AC             AP
     var v0 = b.menos(a), v1 = c.menos(a), v2 = p.menos(a);
-    var invden = 1 / (v0.x * v1.y - v1.x * v0.y);
-    var v = (v2.x * v1.y - v1.x * v2.y) * invden;
-    var w = (v0.x * v2.y - v2.x * v0.y) * invden;
+
+    // T: v0.x v1.x
+    //    v0.y v1.y
+
+    // cofT: v1.y -v1.x
+    //      -v0.y  v0.x
+    //                          det(T)
+    var invdet = 1 / (v0.x * v1.y - v1.x * v0.y); // 1/det(T)
+    // primeira linha de cofT*AP*invdet
+    var v = (v2.x * v1.y - v1.x * v2.y) * invdet;
+    // segunda linha de cofT*AP*invdet
+    var w = (v0.x * v2.y - v2.x * v0.y) * invdet;
     var u = 1 - v - w;
     return {u, v, w};
 }
 
 function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
-    //debugger;
+    // aqui encontramos quanto x de cada lado deve mudar
+    // quando y SUBIR (no caso diminuir pois o y é invertido)
+
+
+
+    //         v1    v2
+    //
+    //       v3
+    // se v3.x < v1.x, invslope1 dará negativo mas nós precisamos que
+    // curx1 aumente conforme Y diminui! por isso, faremos
+    // curx1 -= invslope1.
+    
     var invslope1 = (v3.x - v1.x) / (v3.y - v1.y);
     var invslope2 = (v3.x - v2.x) / (v3.y - v2.y);
 
@@ -1129,10 +1295,18 @@ function drawTriangle(triangle) {
 	fillTopFlatTriangle(v1, v2, v3, v1.originalVertex, v2.originalVertex, v3.originalVertex);
     }
     else {
-	//debugger;
+
 	//general case - split the triangle in a topflat and bottom-flat one
 	var v4 = new Ponto2d(
 	    Math.round((v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x))), v2.y);
+	// após quebrar o triângulo em dois, nós terminamos com um vértice
+	// artificial. Como faremos as interpolações? Para isso criamos um
+	// vértice 3D artificial também, aproximado, e usamos ele para as
+	// interpolações.
+
+	// em retrospectiva provavelmente teria sido melhor usar um dos três
+	// vértices originais mesmo e usar o v4 apenas para o scanline, usando
+	// os originais para as interpolações ainda (menos aproximações).
 	var lp = baricentro(v4, v1, v2, v3);
 	var P = new Ponto(window.objeto.V[v1.originalVertex].x * lp.u +
 			  window.objeto.V[v2.originalVertex].x * lp.v +
@@ -1157,6 +1331,10 @@ function drawTriangle(triangle) {
     }
 }
 
+// esta função simplesmente captura cada face de um triângulo e obriga ela a ser
+// desenhada. Uma melhoria pesquisada foi como fazer com que o drawTriangle
+// fosse feito pela GPU, mas resultados concretos não foram obtidos tem tempo
+// hábil.
 function renderObj() {
     var faces = window.objeto.F;
     for (const face of faces) {
