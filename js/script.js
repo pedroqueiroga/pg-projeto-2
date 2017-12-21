@@ -48,7 +48,7 @@ window.waitingSong.oncanplay = function() {
     // window.cv.height = window.cv.clientHeight;
     window.gl = cv.getContext("webgl");
     if (!window.gl) {
-	alert("weblg não suportado");
+	alert("webgl não suportado");
     }
 
     window.program =
@@ -100,9 +100,6 @@ window.waitingSong.oncanplay = function() {
 		 gl.drawingBufferWidth,
 		 gl.drawingBufferHeight);
 
-
-    // createCanvas(1024, 768);
-    // background(bgColor);
     // Checar suporte do browser para File
     if (window.File && window.FileReader && window.FileList && window.Blob) {
 	window.cameraFileChooser.addEventListener('change',
@@ -685,65 +682,65 @@ function hmmm() {
     }, 500);
 }
 
-function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
-    var lp = lerp(xf, v1, v2);
-    var P, N;
-    var objVa, objVb;
-    if (!a && a != 0) {
-	objVa = P4;
-	objVa.N = N4;
-    } else {
-	objVa = window.objeto.V[a];
-    }
-    if (!b && b != 0) {
-	objVb = P4;
-	objVb.N = N4;
-    } else {
-	objVb = window.objeto.V[b];
-    }
-    if (isNaN(lp.v)) {
-	if (objVa.z <= objVb.z) {
-	    P = new Ponto(objVa.x,
-			  objVa.y,
-			  objVa.z);
-	    N = new Vetor(objVa.N.x,
-			  objVa.N.y,
-			  objVa.N.z);
-	} else {
-	    P = new Ponto(objVb.x,
-			  objVb.y,
-			  objVb.z);
-	    N = new Vetor(objVb.N.x,
-			  objVb.N.y,
-			  objVb.N.z);
-	}
-    } else {
-	P = new Ponto(objVa.x * lp.u +
-		      objVb.x * lp.v,
-		      objVa.y * lp.u +
-		      objVb.y * lp.v,
-		      objVa.z * lp.u +
-		      objVb.z * lp.v);
-	N = new Vetor(objVa.N.x * lp.u +
-		      objVb.N.x * lp.v,
-		      objVa.N.y * lp.u +
-		      objVb.N.y * lp.v ,
-		      objVa.N.z * lp.u +
-		      objVb.N.z * lp.v);
-    }
-    if (xf >= 0 && scanlineY >= 0 &&
-	xf < cv.width && scanlineY < cv.height &&
-	P.z <= window.zBuffer[xf][scanlineY]) {
-	if (P.z <= -1000) {
-	    debugger;
-	}
-	window.zBuffer[xf][scanlineY] = P.z;
-	window.nBuffer[xf][scanlineY] = N;
-	window.pBuffer[xf][scanlineY] = P;
+// function zBufHorizontal(xf, scanlineY, v1, v2, a, b, P4, N4) {
+//     var lp = lerp(xf, v1, v2);
+//     var P, N;
+//     var objVa, objVb;
+//     if (!a && a != 0) {
+// 	objVa = P4;
+// 	objVa.N = N4;
+//     } else {
+// 	objVa = window.objeto.V[a];
+//     }
+//     if (!b && b != 0) {
+// 	objVb = P4;
+// 	objVb.N = N4;
+//     } else {
+// 	objVb = window.objeto.V[b];
+//     }
+//     if (isNaN(lp.v)) {
+// 	if (objVa.z <= objVb.z) {
+// 	    P = new Ponto(objVa.x,
+// 			  objVa.y,
+// 			  objVa.z);
+// 	    N = new Vetor(objVa.N.x,
+// 			  objVa.N.y,
+// 			  objVa.N.z);
+// 	} else {
+// 	    P = new Ponto(objVb.x,
+// 			  objVb.y,
+// 			  objVb.z);
+// 	    N = new Vetor(objVb.N.x,
+// 			  objVb.N.y,
+// 			  objVb.N.z);
+// 	}
+//     } else {
+// 	P = new Ponto(objVa.x * lp.u +
+// 		      objVb.x * lp.v,
+// 		      objVa.y * lp.u +
+// 		      objVb.y * lp.v,
+// 		      objVa.z * lp.u +
+// 		      objVb.z * lp.v);
+// 	N = new Vetor(objVa.N.x * lp.u +
+// 		      objVb.N.x * lp.v,
+// 		      objVa.N.y * lp.u +
+// 		      objVb.N.y * lp.v ,
+// 		      objVa.N.z * lp.u +
+// 		      objVb.N.z * lp.v);
+//     }
+//     if (xf >= 0 && scanlineY >= 0 &&
+// 	xf < cv.width && scanlineY < cv.height &&
+// 	P.z <= window.zBuffer[xf][scanlineY]) {
+// 	if (P.z <= -1000) {
+// 	    debugger;
+// 	}
+// 	window.zBuffer[xf][scanlineY] = P.z;
+// 	window.nBuffer[xf][scanlineY] = N;
+// 	window.pBuffer[xf][scanlineY] = P;
 
-	//	phong(N, P, xf, scanlineY);
-    }
-}
+// 	//	phong(N, P, xf, scanlineY);
+//     }
+// }
 
 function phong(N, P, xf, y) {
 
@@ -784,65 +781,65 @@ function phong(N, P, xf, y) {
     //point(xf, y);
 }
 
-function zBufVertical(xf, y, v1, v2, a, b, P4, N4) {
-    var lp = lerp(y, v1, v2);
-    var P, N;
-    var objVa, objVb;
-    if (!a && a != 0) {
-	objVa = P4;
-	objVa.N = N4;
-    } else {
-	objVa = window.objeto.V[a];
-    }
-    if (!b && b != 0) {
-	objVb = P4;
-	objVb.N = N4;
-    } else {
-	objVb = window.objeto.V[b];
-    }
-    if (isNaN(lp.v)) {
-	if (objVa.z <= objVb.z) {
-	    P = new Ponto(objVa.x,
-			  objVa.y,
-			  objVa.z);
-	    N = new Vetor(objVa.N.x,
-			  objVa.N.y,
-			  objVa.N.z);
-	} else {
-	    P = new Ponto(objVb.x,
-			  objVb.y,
-			  objVb.z);
-	    N = new Vetor(objVb.N.x,
-			  objVb.N.y,
-			  objVb.N.z);
-	}
-    } else {
-	P = new Ponto(objVa.x * lp.u +
-		      objVb.x * lp.v,
-		      objVa.y * lp.u +
-		      objVb.y * lp.v,
-		      objVa.z * lp.u +
-		      objVb.z * lp.v);
-	N = new Vetor(objVa.N.x * lp.u +
-		      objVb.N.x * lp.v,
-		      objVa.N.y * lp.u +
-		      objVb.N.y * lp.v ,
-		      objVa.N.z * lp.u +
-		      objVb.N.z * lp.v);
-    }
-    if (xf >= 0 && y >= 0 &&
-	xf < cv.width && y < cv.height &&
-	P.z <= window.zBuffer[xf][y]) {
-	if (P.z <= -1000) {
-	    debugger;
-	}
-	window.zBuffer[xf][y] = P.z;
-	window.nBuffer[xf][y] = N;
-	window.pBuffer[xf][y] = P;
+// function zBufVertical(xf, y, v1, v2, a, b, P4, N4) {
+//     var lp = lerp(y, v1, v2);
+//     var P, N;
+//     var objVa, objVb;
+//     if (!a && a != 0) {
+// 	objVa = P4;
+// 	objVa.N = N4;
+//     } else {
+// 	objVa = window.objeto.V[a];
+//     }
+//     if (!b && b != 0) {
+// 	objVb = P4;
+// 	objVb.N = N4;
+//     } else {
+// 	objVb = window.objeto.V[b];
+//     }
+//     if (isNaN(lp.v)) {
+// 	if (objVa.z <= objVb.z) {
+// 	    P = new Ponto(objVa.x,
+// 			  objVa.y,
+// 			  objVa.z);
+// 	    N = new Vetor(objVa.N.x,
+// 			  objVa.N.y,
+// 			  objVa.N.z);
+// 	} else {
+// 	    P = new Ponto(objVb.x,
+// 			  objVb.y,
+// 			  objVb.z);
+// 	    N = new Vetor(objVb.N.x,
+// 			  objVb.N.y,
+// 			  objVb.N.z);
+// 	}
+//     } else {
+// 	P = new Ponto(objVa.x * lp.u +
+// 		      objVb.x * lp.v,
+// 		      objVa.y * lp.u +
+// 		      objVb.y * lp.v,
+// 		      objVa.z * lp.u +
+// 		      objVb.z * lp.v);
+// 	N = new Vetor(objVa.N.x * lp.u +
+// 		      objVb.N.x * lp.v,
+// 		      objVa.N.y * lp.u +
+// 		      objVb.N.y * lp.v ,
+// 		      objVa.N.z * lp.u +
+// 		      objVb.N.z * lp.v);
+//     }
+//     if (xf >= 0 && y >= 0 &&
+// 	xf < cv.width && y < cv.height &&
+// 	P.z <= window.zBuffer[xf][y]) {
+// 	if (P.z <= -1000) {
+// 	    debugger;
+// 	}
+// 	window.zBuffer[xf][y] = P.z;
+// 	window.nBuffer[xf][y] = N;
+// 	window.pBuffer[xf][y] = P;
 	
-	// phong(N, P, xf, y);
-    }
-}
+// 	// phong(N, P, xf, y);
+//     }
+// }
 
 function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
     var bar = baricentro(new Ponto2d(xf, scanlineY),
@@ -872,6 +869,7 @@ function zBuf(xf, scanlineY, v1, v2, v3, a, b, c, P4, N4) {
     
     if (isNaN(bar.u) || isNaN(bar.v) || isNaN(bar.w)) {
 	// diagonal
+	return;
 	var lp1 = lerp2d({x: xf, y: scanlineY},
 			 v1, v2);
 	var lp2 = lerp2d({x: xf, y: scanlineY},
@@ -978,35 +976,37 @@ function fillBottomFlatTriangle(v1, v2, v3, a, b, c, P, N) {
     if (v1.y == v2.y) {
 	// caso de uma linha horizontal
 	// ou um ponto
-	var arrX = [v1, v2, v3];
-	arrX = arrX.sort(function(a, b) {
-	    return a.x - b.x;
-	});
-	var x0 = arrX[0];
-	var xm = arrX[1];
-	var xf = arrX[2];
-	for (var i = x0.x; i <= xm.x; i++) {
-	    zBufHorizontal(i, v1.y, x0.x, xm.x, x0.originalVertex, xm.originalVertex, P, N);
-	}
-	for (i = xm.x; i <= xf.x; i++) {
-	    zBufHorizontal(i, v1.y, xm.x, xf.x, xm.originalVertex, xf.originalVertex, P, N);
-	}
-	for (i = x0.x; i <= xf.x; i++) {
-	    zBufHorizontal(i, v1.y, x0.x, xf.x, x0.originalVertex, xf.originalVertex, P, N);
-	}
+	// var arrX = [v1, v2, v3];
+	// arrX = arrX.sort(function(a, b) {
+	//     return a.x - b.x;
+	// });
+	// var x0 = arrX[0];
+	// var xm = arrX[1];
+	// var xf = arrX[2];
+	// for (var i = x0.x; i <= xm.x; i++) {
+	//     zBufHorizontal(i, v1.y, x0.x, xm.x, x0.originalVertex, xm.originalVertex, P, N);
+	// }
+	// for (i = xm.x; i <= xf.x; i++) {
+	//     zBufHorizontal(i, v1.y, xm.x, xf.x, xm.originalVertex, xf.originalVertex, P, N);
+	// }
+	// for (i = x0.x; i <= xf.x; i++) {
+	//     zBufHorizontal(i, v1.y, x0.x, xf.x, x0.originalVertex, xf.originalVertex, P, N);
+	// }
+	return;
     } else if (v1.x == v2.x && v1.x == v3.x) {
 	// caso de uma linha vertical
-	var arrX = [v1, v2, v3];
-	// v1.y <= v2.y == v3.y
-	for (var i = v1.y; i <= v2.y; i++) {
-	    zBufVertical(v1.x, i, v1.y, v2.y, v1.originalVertex, v2.originalVertex, P, N);
-	}
-	for (i = v2.y; i <= v3.y; i++) {
-	    zBufVertical(v2.x, i, v2.y, v3.y, v2.originalVertex, v3.originalVertex, P, N);
-	}
-	for (i = v3.y; i >= v1.y; i--) {
-	    zBufVertical(v3.x, i, v3.y, v1.y, v3.originalVertex, v1.originalVertex, P, N);
-	}
+	// var arrX = [v1, v2, v3];
+	// // v1.y <= v2.y == v3.y
+	// for (var i = v1.y; i <= v2.y; i++) {
+	//     zBufVertical(v1.x, i, v1.y, v2.y, v1.originalVertex, v2.originalVertex, P, N);
+	// }
+	// for (i = v2.y; i <= v3.y; i++) {
+	//     zBufVertical(v2.x, i, v2.y, v3.y, v2.originalVertex, v3.originalVertex, P, N);
+	// }
+	// for (i = v3.y; i >= v1.y; i--) {
+	//     zBufVertical(v3.x, i, v3.y, v1.y, v3.originalVertex, v1.originalVertex, P, N);
+	// }
+	return;
     } else {
 	for (var scanlineY = v1.y; scanlineY <= v2.y; scanlineY++) {
 	    var x = curx1 < curx2 ? curx1 : curx2;
@@ -1059,35 +1059,37 @@ function fillTopFlatTriangle(v1, v2, v3, a, b, c, P, N) {
     if (v1.y == v3.y) {
 	// caso de uma linha horizontal
 	// ou um ponto
-	var arrX = [v1, v2, v3];
-	arrX = arrX.sort(function(a, b) {
-	    return a.x - b.x;
-	});
-	var x0 = arrX[0];
-	var xm = arrX[1];
-	var xf = arrX[2];
-	for (var i = x0.x; i <= xm.x; i++) {
-	    zBufHorizontal(i, v1.y, x0.x, xm.x, x0.originalVertex, xm.originalVertex, P, N);
-	}
-	for (i = xm.x; i <= xf.x; i++) {
-	    zBufHorizontal(i, v1.y, xm.x, xf.x, xm.originalVertex, xf.originalVertex, P, N);
-	}
-	for (i = x0.x; i <= xf.x; i++) {
-	    zBufHorizontal(i, v1.y, x0.x, xf.x, x0.originalVertex, xf.originalVertex, P, N);
-	}
+	// var arrX = [v1, v2, v3];
+	// arrX = arrX.sort(function(a, b) {
+	//     return a.x - b.x;
+	// });
+	// var x0 = arrX[0];
+	// var xm = arrX[1];
+	// var xf = arrX[2];
+	// for (var i = x0.x; i <= xm.x; i++) {
+	//     zBufHorizontal(i, v1.y, x0.x, xm.x, x0.originalVertex, xm.originalVertex, P, N);
+	// }
+	// for (i = xm.x; i <= xf.x; i++) {
+	//     zBufHorizontal(i, v1.y, xm.x, xf.x, xm.originalVertex, xf.originalVertex, P, N);
+	// }
+	// for (i = x0.x; i <= xf.x; i++) {
+	//     zBufHorizontal(i, v1.y, x0.x, xf.x, x0.originalVertex, xf.originalVertex, P, N);
+	// }
+	return;
     } else if (v1.x == v2.x && v1.x == v3.x) {
-	// caso de uma linha vertical
-	var arrX = [v1, v2, v3];
-	// v1.y <= v2.y == v3.y
-	for (var i = v1.y; i <= v2.y; i++) {
-	    zBufVertical(v1.x, i, v1.y, v2.y, v1.originalVertex, v2.originalVertex, P, N);
-	}
-	for (i = v2.y; i <= v3.y; i++) {
-	    zBufVertical(v2.x, i, v2.y, v3.y, v2.originalVertex, v3.originalVertex, P, N);
-	}
-	for (i = v3.y; i >= v1.y; i--) {
-	    zBufVertical(v3.x, i, v3.y, v1.y, v3.originalVertex, v1.originalVertex, P, N);
-	}
+	// // caso de uma linha vertical
+	// var arrX = [v1, v2, v3];
+	// // v1.y <= v2.y == v3.y
+	// for (var i = v1.y; i <= v2.y; i++) {
+	//     zBufVertical(v1.x, i, v1.y, v2.y, v1.originalVertex, v2.originalVertex, P, N);
+	// }
+	// for (i = v2.y; i <= v3.y; i++) {
+	//     zBufVertical(v2.x, i, v2.y, v3.y, v2.originalVertex, v3.originalVertex, P, N);
+	// }
+	// for (i = v3.y; i >= v1.y; i--) {
+	//     zBufVertical(v3.x, i, v3.y, v1.y, v3.originalVertex, v1.originalVertex, P, N);
+	// }
+	return;
     } else {
 	for (var scanlineY = v3.y; scanlineY > v1.y; scanlineY--) {
 	    var x = curx1 < curx2 ? curx1 : curx2;
