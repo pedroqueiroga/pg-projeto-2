@@ -7,18 +7,7 @@
   </head>
   <body>
     <div id="options">
-      <button type="button" id="ZH" disabled="true">Z H.</button>
-      <button type="button" id="ZAH" disabled="true">Z A.H.</button>
-      <button type="button" id="XH" disabled="true">X H.</button>
-      <button type="button" id="XAH" disabled="true">X A.H.</button>
-      <button type="button" id="YH" disabled="true">Y H.</button>
-      <button type="button" id="YAH" disabled="true">Y A.H.</button>
-      <button type="button" id="rotate" disabled="true">EXECUTAR ROTAÇÕES</button>
-      <div class="tooltip options">
-	<input id="degrees"></input>
-	<span class="tooltiptext">Ângulo em graus</span>
-      </div>
-      <button type="button" id="initialSteps" disabled="true">botão</button>
+      <h5>Rotação em 3 eixos</h5>
       <div>
         <label>Escolha o arquivo de configuração da câmera.</label>
         <input type="file" id="cameraFile" disabled>
@@ -33,14 +22,30 @@
         <label>Escolha o arquivo de objeto.</label>
         <input type="file" id="objectFile" disabled />
       </div>
+      <button type="button" id="initialSteps" disabled="true">Carregar Parametros</button>
+      
+      <div class="tooltip">
+        <label>Ângulo:</label>
+        <input id="degrees" value=90></input>
+        <span class="tooltiptext">Ângulo em graus</span>
+      </div>
+
+      <div id="rotations">
+        <button type="button" id="ZH" disabled="true">Z, horário</button>
+        <button type="button" id="ZAH" disabled="true">Z, antihorário</button>
+        <button type="button" id="XH" disabled="true">X, horário</button>
+        <button type="button" id="XAH" disabled="true">X, antihorário</button>
+        <button type="button" id="YH" disabled="true">Y, horário</button>
+        <button type="button" id="YAH" disabled="true"> Y, antihorário</button>
+      </div>
+
+      <label>Rotações:</label>
       <div id="rotateStack"></div>
+
+      <button type="button" id="rotate" disabled="true">EXECUTAR ROTAÇÕES</button>
+
     </div>
 
-    <div id="log">
-      <div id="chosencamera"></div>
-      <div id="chosenlight"></div>
-      <div id="chosenobject"></div>
-    </div>
   </body>
   <script type="text/javascript" src="js/leitor.js"></script>
   <script type="text/javascript" src="js/vetor.js"></script>
