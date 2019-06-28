@@ -1052,9 +1052,13 @@ function zBuf(xf, scanlineY, v1, v2, v3) {
 	// pixels seja pintado (nenhum é realmente pintado por cima de outro),
 	// a um custo maior de memória. O ideal seria isso daqui ser tudo
 	// na gpu.
-	window.zBuffer[xf][scanlineY] = P.z;
-	window.nBuffer[xf][scanlineY] = N;
-	window.pBuffer[xf][scanlineY] = P;
+	for(var i = -5; i < 6; ++i) {
+		for(var j = -5; j < 6; ++j) {
+			window.zBuffer[xf + i][scanlineY + j] = P.z;
+			window.nBuffer[xf + i][scanlineY + j] = N;
+			window.pBuffer[xf + i][scanlineY + j] = P;
+		}
+	}
 	//	phong(N, P, xf, scanlineY);
     }
 
@@ -1274,12 +1278,16 @@ function drawTriangle(triangle) {
     var v2 = vertices[1];
     var v3 = vertices[2];
 
-    /* here we know that v1.y <= v2.y <= v3.y */
-    /* check for trivial case of bottom-flat triangle */
+	zBuf(v1.x, v1.y, v1, v2, v3)
+	zBuf(v2.x, v2.y, v1, v2, v3)
+	zBuf(v3.x, v3.y, v1, v2, v3)
+	/*
+	// here we know that v1.y <= v2.y <= v3.y 
+    // check for trivial case of bottom-flat triangle 
     if (v2.y == v3.y) {
 	fillBottomFlatTriangle(v1, v2, v3, v1, v2, v3);
     }
-    /* check for trivial case of top-flat triangle */
+    // check for trivial case of top-flat triangle 
     else if (v1.y == v2.y) {
 	fillTopFlatTriangle(v1, v2, v3, v1, v2, v3);
     }
@@ -1289,7 +1297,8 @@ function drawTriangle(triangle) {
 	    Math.round((v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x))), v2.y);
 	fillBottomFlatTriangle(v1, v2, v4, v1, v2, v3);
 	fillTopFlatTriangle(v2, v4, v3, v1, v2, v3);
-    }
+	}
+	*/
 }
 
 // esta função simplesmente captura cada face de um triângulo e obriga ela a ser
